@@ -1,0 +1,105 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Lato', ui-sans-serif, system-ui, sans-serif;
+    /* The live site names Astoria Classic Sans but never loads it, so browsers render their default sans-serif. */
+    --font-display: 'Astoria Classic Sans', sans-serif;
+    --font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+    --color-forest: #0f6b4f;
+    --color-forest-dark: #0a4d39;
+    --color-cream: #f8f1e7;
+    --color-linen: #f3eadc;
+    --color-sand: #e1c9a5;
+    --color-gold: #c99a4a;
+    --color-cocoa: #2b1d18;
+    --color-ink: #333333;
+    --color-umber: #594028;
+    --color-mist: #f4f6f9;
+    --color-field: #f7f9fb;
+}
+
+@layer base {
+    body {
+        @apply bg-cream font-sans text-[18px] leading-[27px] text-ink antialiased;
+    }
+
+    h1, h2, h3 {
+        @apply font-display font-normal leading-none text-cocoa;
+    }
+}
+
+@utility container-site {
+    @apply mx-auto w-full max-w-[1600px] px-[10px] md:px-5;
+}
+
+/* Elementor-style pill buttons: Lato 500 16px, 15px × 30px. */
+@utility btn {
+    @apply inline-flex items-center justify-center rounded-[50px] px-[30px] py-[15px] text-center font-sans text-base leading-4 font-medium transition;
+}
+
+@utility btn-primary {
+    @apply btn bg-forest text-white hover:bg-forest-dark;
+}
+
+@utility btn-glass {
+    @apply btn border border-white bg-white/[0.13] text-white hover:bg-white/25;
+}
+
+@utility btn-outline {
+    @apply btn border border-forest bg-transparent text-forest hover:bg-forest hover:text-white;
+}
+
+@utility btn-dark {
+    @apply btn bg-cocoa text-white shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:bg-black;
+}
+
+@utility section-title {
+    @apply text-[26px] md:text-[55px];
+}
+
+@utility link-underline {
+    @apply border-b-2 border-forest pb-0.5 font-sans text-[18px] leading-[18px] font-medium text-forest;
+}
+
+/* Fluent Forms look used by the contact, booking and custom design forms. */
+@utility ff-label {
+    @apply mb-[5px] inline-block font-sans text-[15px] leading-[1.4] font-bold text-[#1e1f21];
+}
+
+@utility ff-required {
+    @apply ml-[3px] text-[#f56c6c];
+}
+
+@utility ff-input {
+    @apply block w-full rounded-[7px] border border-[#dadbdd] bg-white px-[15px] py-[11px] font-sans text-base leading-[1.2] text-[#1e1f21] outline-none placeholder:text-[#868e96] focus:border-forest;
+}
+
+@utility ff-submit {
+    @apply rounded-[7px] bg-forest px-5 py-3 font-sans text-base font-medium text-white hover:bg-forest-dark;
+}
+
+/* WooCommerce default look used by account, cart and checkout. */
+@utility woo-input {
+    @apply block w-full border border-[#ccc] bg-[#f7f7f7] px-3 py-3 font-sans text-base text-ink outline-none focus:border-forest;
+}
+
+@utility woo-button {
+    @apply inline-block bg-forest px-8 py-3 font-sans text-[15px] leading-none text-white hover:bg-forest-dark;
+}
+
+/* Long-form policy pages (plain WordPress content). */
+@utility prose-policy {
+    @apply font-sans text-base leading-normal text-ink;
+
+    & h2 { @apply mt-2 mb-4 font-sans text-[32px] leading-[1.2] font-medium text-ink first:mt-0; }
+    & h3 { @apply mt-2 mb-4 font-sans text-[28px] leading-[1.2] font-medium text-ink; }
+    & p { @apply mb-[14.4px]; }
+    & ul { @apply mb-0 list-disc pl-10; }
+    & ol { @apply mb-0 list-decimal pl-10; }
+    & a { @apply text-[#cc3366] underline; }
+    & strong { @apply font-bold; }
+}
