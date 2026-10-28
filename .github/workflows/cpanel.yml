@@ -1,0 +1,161 @@
+name: Deploy To Cpanel Server
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      run_seed:
+        description: 'Run database seeders after migration (first deploy only: loads the sample catalogue)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+concurrency:
+  group: prod/${{ github.workflow }}
+  cancel-in-progress: true
+
+env:
+  # CloudLinux alt-php 8.5; phar, dom, fileinfo and mbstring are not loaded by default.
+  # Load them from an extra ini scan dir so child processes (composer scripts) get them too.
+  PHP_SETUP: >-
+    mkdir -p "$HOME/.php85-ext" &&
+    printf "extension=phar.so\nextension=dom.so\nextension=fileinfo.so\nextension=mbstring.so\n" > "$HOME/.php85-ext/extensions.ini" &&
+    export PHP_INI_SCAN_DIR="/opt/alt/php85/link/conf:$HOME/.php85-ext"
+  PHP_CLI: /opt/alt/php85/usr/bin/php
+  COMPOSER_PHAR: /opt/alt/php85/usr/bin/composer.phar
+
+jobs:
+  server-deploy:
+    environment: prod
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # The layouts load CSS/JS through @vite, and public/build is gitignored, so build it here.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # --legacy-peer-deps: laravel-vite-plugin lists fontaine ^0.8 as an optional peer while the project uses fontaine 1.x.
+      - name: Build frontend assets
+        run: |
+          npm ci --legacy-peer-deps
+          npm run build
+
+      - name: Prepare deploy files
+        run: |
+          mkdir -p deploy
+          rsync -av --exclude='.git' --exclude='.github' --exclude='node_modules' --exclude='deploy' ./ deploy/
+
+      - name: Clean target directory on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            cd "${{ secrets.SSH_TARGET }}" && find . -mindepth 1 -maxdepth 1 ! -name 'storage' ! -name '.env' -exec rm -rf {} +
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          source: "deploy/*"
+          target: ${{ secrets.SSH_TARGET }}
+          overwrite: true
+          strip_components: 1
+
+      - name: Create .env file
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+        run: printf '%s' "$ENV_FILE" > .env
+
+      - name: Copy env file to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          source: ".env"
+          target: ${{ secrets.SSH_TARGET }}
+          overwrite: true
+
+      - name: Create root .htaccess file
+        run: |
+          cat <<'EOF' > .htaccess
+          <IfModule mod_rewrite.c>
+              RewriteEngine On
+              RewriteCond %{REQUEST_URI} !^/public/
+              RewriteRule ^(.*)$ public/$1 [L]
+          </IfModule>
+          EOF
+
+      - name: Copy .htaccess to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          source: ".htaccess"
+          target: ${{ secrets.SSH_TARGET }}
+          overwrite: true
+
+      - name: Install composer dependencies on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: bash -lc '${{ env.PHP_SETUP }} && cd "${{ secrets.SSH_TARGET }}" && ${{ env.PHP_CLI }} ${{ env.COMPOSER_PHAR }} install --no-dev --optimize-autoloader'
+
+  migration:
+    runs-on: ubuntu-latest
+    needs: server-deploy
+    environment: prod
+
+    steps:
+      # The clean step removes public/, so recreate the public/storage link that serves uploaded product photos.
+      - name: Run migrations on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: bash -lc '${{ env.PHP_SETUP }} && cd "${{ secrets.SSH_TARGET }}" && ${{ env.PHP_CLI }} artisan storage:link --force && ${{ env.PHP_CLI }} artisan config:cache && ${{ env.PHP_CLI }} artisan route:cache && ${{ env.PHP_CLI }} artisan view:cache && ${{ env.PHP_CLI }} artisan migrate --force'
+
+  seeding:
+    runs-on: ubuntu-latest
+    needs: migration
+    environment: prod
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.run_seed == 'true'
+
+    steps:
+      - name: Run database seeders on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: bash -lc '${{ env.PHP_SETUP }} && cd "${{ secrets.SSH_TARGET }}" && ${{ env.PHP_CLI }} artisan db:seed --force'
