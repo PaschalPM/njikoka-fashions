@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Appointment;
 use App\Models\DesignRequest;
 use App\Models\User;
+use App\Models\WhatsappContact;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -31,5 +32,7 @@ class AppServiceProvider extends ServiceProvider
             'newDesignRequests' => DesignRequest::where('status', 'new')->count(),
             'newAppointments' => Appointment::where('status', 'new')->count(),
         ]));
+
+        View::composer('components.layouts.app', fn ($view) => $view->with('whatsappContacts', WhatsappContact::forStorefront()));
     }
 }

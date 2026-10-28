@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\WhatsappContact;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -29,30 +30,24 @@ class CartController extends Controller
             'total_cents' => $items->sum('subtotal_cents'),
             'favorites' => Product::whereIn('id', $favoriteIds)->where('in_stock', true)->take(4)->get(),
             'newInStore' => $items->isEmpty() ? Product::where('in_stock', true)->latest('id')->take(4)->get() : collect(),
-            'whatsappOrderUrl' => $this->whatsappOrderUrl($items),
+            'whatsappOrderLinks' => $this->whatsappOrderLinks($items),
         ]);
     }
 
     /**
-     * Link that opens WhatsApp with the cart written out, so the store can follow up on the order in chat.
+     * One link per admin-listed WhatsApp contact; the customer picks who follows up on the order.
      *
      * @param  Collection<int, object{product: Product, quantity: int, subtotal_cents: int}>  $items
+     * @return Collection<int, object{contact: WhatsappContact, url: string}>
      */
-    private function whatsappOrderUrl(Collection $items): ?string
+    private function whatsappOrderLinks(Collection $items): Collection
     {
-        if ($items->isEmpty() || ! config('store.whatsapp')) {
-            return null;
+        if ($items->isEmpty()) {
+            return collect();
         }
 
-        $lines = $items->map(fn ($item) => "• {$item->product->name} × {$item->quantity}: $".number_format($item->subtotal_cents / 100, 2)
-            ."\n  ".route('product', $item->product));
-
-        $message = "Hi Njikoka Fashions! I'd like to order:\n\n"
-            .$lines->implode("\n")
-            ."\n\nTotal: $".number_format($items->sum('subtotal_cents') / 100, 2)
-            ."\n\nCould you help me complete this order?";
-
-        return 'https://wa.me/'.config('store.whatsapp').'?text='.rawurlencode($message);
+        return WhatsappContact::forStorefront()
+            ->map(fn (WhatsappContact $contact) => (object) ['contact' => $contact, 'url' => route('whatsapp.order', $contact->number)]);
     }
 
     public function store(Request $request, Product $product): RedirectResponse

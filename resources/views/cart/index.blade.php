@@ -78,14 +78,41 @@
 
                         <a href="{{ route('checkout') }}" class="btn-primary mt-6 w-full py-[18px] text-[17px]">Proceed to Checkout</a>
 
-                        @if ($whatsappOrderUrl)
+                        @if ($whatsappOrderLinks->isNotEmpty())
                             <div class="my-4 flex items-center gap-3 text-xs tracking-[0.08em] text-ink/40 uppercase">
                                 <span class="h-px flex-1 bg-sand"></span>or<span class="h-px flex-1 bg-sand"></span>
                             </div>
-                            <a href="{{ $whatsappOrderUrl }}" target="_blank" rel="noopener" class="btn w-full gap-2 border-2 border-[#25d366] py-4 text-[17px] text-[#128c4a] hover:bg-[#25d366] hover:text-white">
-                                @include('partials.icons.whatsapp')
-                                Order via WhatsApp
-                            </a>
+                            @if ($whatsappOrderLinks->count() === 1)
+                                <a href="{{ $whatsappOrderLinks->first()->url }}" target="_blank" rel="nofollow noopener" class="btn w-full gap-2 border-2 border-[#25d366] py-4 text-[17px] text-[#128c4a] hover:bg-[#25d366] hover:text-white">
+                                    @include('partials.icons.whatsapp')
+                                    Order via WhatsApp
+                                </a>
+                            @else
+                                <details class="group/order">
+                                    <summary class="btn w-full cursor-pointer list-none gap-2 border-2 border-[#25d366] py-4 text-[17px] text-[#128c4a] hover:bg-[#25d366] hover:text-white group-open/order:bg-[#25d366] group-open/order:text-white [&::-webkit-details-marker]:hidden">
+                                        @include('partials.icons.whatsapp')
+                                        Order via WhatsApp
+                                        <svg class="size-4 transition group-open/order:rotate-180" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                                    </summary>
+                                    <p class="mt-3 text-sm font-bold text-cocoa">Who would you like to order with?</p>
+                                    <ul class="mt-2 space-y-2">
+                                        @foreach ($whatsappOrderLinks as $link)
+                                            <li>
+                                                <a href="{{ $link->url }}" target="_blank" rel="nofollow noopener" class="group/contact flex items-center gap-3 rounded-xl border border-black/8 px-3 py-2.5 transition hover:border-[#25d366] hover:bg-[#25d366]/8">
+                                                    <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#25d366] text-white">
+                                                        @include('partials.icons.whatsapp', ['class' => 'size-5'])
+                                                    </span>
+                                                    <span class="min-w-0 flex-1">
+                                                        <span class="block truncate text-[15px] font-bold text-cocoa">{{ $link->contact->label }}</span>
+                                                        <span class="block text-sm text-ink/60">{{ $link->contact->displayNumber() }}</span>
+                                                    </span>
+                                                    <svg class="size-5 shrink-0 text-ink/30 transition group-hover/contact:translate-x-0.5 group-hover/contact:text-[#128c4a]" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </details>
+                            @endif
                             <p class="mt-2 text-center text-xs text-ink/50">Sends your cart to our team so we can finish the order with you in chat.</p>
                         @endif
 

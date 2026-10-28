@@ -18,8 +18,9 @@ return [
     'address' => env('STORE_ADDRESS', '14502 Greenview Drive Laurel, Maryland 20708'),
 
     /*
-    | WhatsApp number for the "Chat with us" button, in international format
-    | without "+" or spaces (country code first). Leave empty to hide the button.
+    | Fallback WhatsApp number for the "Chat with us" button, used until numbers
+    | are saved under Admin > WhatsApp. International format without "+" or
+    | spaces (country code first). Leave empty to hide the button.
     */
 
     'whatsapp' => preg_replace('/\D/', '', (string) env('STORE_WHATSAPP', '13019680567')),

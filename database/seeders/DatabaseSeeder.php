@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\WhatsappContact;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -69,6 +70,10 @@ class DatabaseSeeder extends Seeder
                 'image' => $image,
                 'in_stock' => true,
             ]);
+        }
+
+        foreach ([['Ify', '2348135438144'], ['Paschal', '2347031102089']] as $position => [$label, $number]) {
+            WhatsappContact::firstOrCreate(['number' => $number], ['label' => $label, 'position' => $position]);
         }
     }
 }

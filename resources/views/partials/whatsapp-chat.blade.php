@@ -1,10 +1,4 @@
-@php
-    $product = request()->route('product');
-    $greeting = $product instanceof \App\Models\Product
-        ? "Hi Njikoka Fashions! I'm interested in {$product->name}: ".route('product', $product)
-        : 'Hi Njikoka Fashions! I have a question.';
-    $chatUrl = 'https://wa.me/'.config('store.whatsapp').'?text='.rawurlencode($greeting);
-@endphp
+@php($product = request()->route('product'))
 
 {{-- Floating "Chat with us" launcher that hands the visitor over to WhatsApp; resources/js/app.js closes it on Escape or an outside click. --}}
 <details data-chat class="group fixed right-4 bottom-4 z-40 sm:right-6 sm:bottom-6">
@@ -38,11 +32,26 @@
         </div>
 
         <div class="px-5 py-4">
-            <a href="{{ $chatUrl }}" target="_blank" rel="noopener" class="flex w-full items-center justify-center gap-2 rounded-full bg-[#25d366] px-5 py-3 text-base font-bold text-white transition hover:bg-[#1ebe5b]">
-                @include('partials.icons.whatsapp')
-                Start chat on WhatsApp
-            </a>
-            <p class="mt-2 text-center text-xs text-ink/50">Opens WhatsApp in a new tab</p>
+            @if ($whatsappContacts->count() > 1)
+                <p class="mb-3 text-sm font-bold text-cocoa">Who would you like to chat with?</p>
+            @endif
+            <ul class="space-y-2">
+                @foreach ($whatsappContacts as $contact)
+                    <li>
+                        <a href="{{ route('whatsapp.chat', array_filter([$contact->number, 'product' => $product instanceof \App\Models\Product ? $product->slug : null])) }}" target="_blank" rel="nofollow noopener" class="group/contact flex items-center gap-3 rounded-xl border border-black/8 px-3 py-2.5 transition hover:border-[#25d366] hover:bg-[#25d366]/8">
+                            <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#25d366] text-white">
+                                @include('partials.icons.whatsapp', ['class' => 'size-5'])
+                            </span>
+                            <span class="min-w-0 flex-1">
+                                <span class="block truncate text-[15px] font-bold text-cocoa">{{ $contact->label }}</span>
+                                <span class="block text-sm text-ink/60">{{ $contact->displayNumber() }}</span>
+                            </span>
+                            <svg class="size-5 shrink-0 text-ink/30 transition group-hover/contact:translate-x-0.5 group-hover/contact:text-[#128c4a]" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+            <p class="mt-3 text-center text-xs text-ink/50">Opens WhatsApp in a new tab</p>
         </div>
     </div>
 </details>

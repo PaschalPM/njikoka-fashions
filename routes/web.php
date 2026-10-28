@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
 use App\Http\Controllers\Admin\DesignRequestController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\WhatsappContactController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\FormController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\WhatsappController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +37,8 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart');
 Route::post('/cart/{product}', [CartController::class, 'store'])->name('cart.store');
 Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
+Route::get('/whatsapp/{number}', [WhatsappController::class, 'chat'])->whereNumber('number')->name('whatsapp.chat');
+Route::get('/whatsapp/{number}/order', [WhatsappController::class, 'order'])->whereNumber('number')->name('whatsapp.order');
 
 Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
 Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
@@ -63,4 +67,7 @@ Route::middleware(['auth', 'can:admin'])->prefix('admin')->name('admin.')->group
     Route::resource('products', AdminProductController::class)->except('show');
     Route::resource('design-requests', DesignRequestController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::resource('appointments', AdminAppointmentController::class)->only(['index', 'show', 'update', 'destroy']);
+    Route::get('whatsapp', [WhatsappContactController::class, 'index'])->name('whatsapp.index');
+    Route::get('whatsapp/numbers', [WhatsappContactController::class, 'edit'])->name('whatsapp.edit');
+    Route::put('whatsapp/numbers', [WhatsappContactController::class, 'update'])->name('whatsapp.update');
 });

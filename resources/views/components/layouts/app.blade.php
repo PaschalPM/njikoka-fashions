@@ -24,7 +24,7 @@
     </main>
 
     @include('partials.footer')
-    @if (config('store.whatsapp'))
+    @if ($whatsappContacts->isNotEmpty())
         @include('partials.whatsapp-chat')
         @include('partials.toast', ['offset' => 'bottom-24 sm:bottom-28'])
     @else
