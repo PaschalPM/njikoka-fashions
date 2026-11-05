@@ -1,5 +1,5 @@
-<x-layouts.app title="My account" header="black" body-class="bg-white">
-    <section class="bg-white font-sans text-base text-ink">
+<x-layouts.app :title="auth()->check() ? 'My account' : 'Log in'" header="black" :body-class="auth()->check() ? 'bg-white' : 'bg-cream'">
+    <section class="font-sans text-base text-ink">
         <div class="container-site pt-[50px] pb-[80px]">
             @auth
                 <h1 class="font-sans text-[32px] leading-[1.2] text-ink">My account</h1>
@@ -47,25 +47,30 @@
                     </div>
                 </div>
             @else
-                <h1 class="font-sans text-[32px] leading-[1.2] text-ink">Login</h1>
+                <div class="mx-auto max-w-[420px] rounded-2xl bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] sm:p-8">
+                    <h1 class="text-center text-[34px] leading-tight">Welcome back</h1>
+                    <p class="mt-1 text-center text-[15px] text-ink/60">Log in to see your orders.</p>
 
-                <form method="POST" action="{{ route('login') }}" class="mt-[45px] border border-[#ddd] px-[30px] py-[30px] text-[14px] text-[#515151]">
-                    @csrf
-                    @include('partials.form-errors')
-                    <label class="block" for="email">Username or email address&nbsp;<span class="text-[#e2401c]">*</span></label>
-                    <input class="woo-input mt-[5px] h-[50px]" type="email" id="email" name="email" value="{{ old('email') }}" autocomplete="username" required>
-
-                    <label class="mt-[25px] block" for="password">Password&nbsp;<span class="text-[#e2401c]">*</span></label>
-                    <input class="woo-input mt-[5px] h-[50px]" type="password" id="password" name="password" autocomplete="current-password" required>
-
-                    <div class="mt-[25px] flex items-center gap-[14px]">
-                        <button class="woo-button w-[100px] px-0 py-[11px] text-[14px]">Log in</button>
-                        <label class="flex items-center gap-1">
-                            <input type="checkbox" name="remember" value="1"> Remember me
+                    <form method="POST" action="{{ route('login') }}" class="mt-6 space-y-4">
+                        @csrf
+                        @include('partials.form-errors')
+                        <div>
+                            <label class="ff-label" for="email">Email</label>
+                            <input class="ff-input" type="email" id="email" name="email" value="{{ old('email') }}" autocomplete="username" required autofocus>
+                        </div>
+                        <div>
+                            <div class="flex items-baseline justify-between gap-3">
+                                <label class="ff-label" for="password">Password</label>
+                                <a href="{{ route('password.request') }}" class="text-sm text-forest hover:underline">Forgot?</a>
+                            </div>
+                            <input class="ff-input" type="password" id="password" name="password" autocomplete="current-password" required>
+                        </div>
+                        <label class="flex w-fit items-center gap-2 text-[15px] text-ink/80">
+                            <input type="checkbox" name="remember" value="1" class="size-4 accent-forest"> Remember me
                         </label>
-                    </div>
-                    <a href="{{ route('password.request') }}" class="mt-[18px] inline-block text-[12px] text-ink hover:underline">Lost your password?</a>
-                </form>
+                        <button class="btn-primary w-full py-3.5">Log in</button>
+                    </form>
+                </div>
             @endauth
         </div>
     </section>
