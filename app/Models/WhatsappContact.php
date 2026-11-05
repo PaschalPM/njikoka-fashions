@@ -20,20 +20,13 @@ class WhatsappContact extends Model
     public const SLOTS = 3;
 
     /**
-     * Contacts shown in the "Chat with us" button, in admin order. Falls back to the
-     * STORE_WHATSAPP number until the admin saves their own.
+     * Contacts shown in the "Chat with us" button and the cart, in admin order.
      *
      * @return Collection<int, WhatsappContact>
      */
     public static function forStorefront(): Collection
     {
-        $contacts = static::orderBy('position')->get();
-
-        if ($contacts->isEmpty() && config('store.whatsapp')) {
-            return collect([new static(['label' => 'Njikoka Fashions', 'number' => config('store.whatsapp')])]);
-        }
-
-        return $contacts;
+        return static::orderBy('position')->get();
     }
 
     public function chatUrl(string $message): string

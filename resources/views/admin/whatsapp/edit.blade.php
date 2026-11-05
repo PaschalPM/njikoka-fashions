@@ -8,11 +8,11 @@
     <h1 class="mt-3 font-display text-[36px] text-cocoa">WhatsApp numbers</h1>
     <p class="mt-2 max-w-2xl text-[15px] text-ink/70">Up to {{ \App\Models\WhatsappContact::SLOTS }} numbers customers can reach from the "Chat with us" button. Customers choose one of them when they chat or send their cart as an order.</p>
 
-    @if ($fallbackNumber)
+    @unless ($hasNumbers)
         <p class="mt-4 max-w-2xl rounded-xl border border-gold/50 bg-gold/10 px-4 py-3 text-sm text-cocoa">
-            No numbers saved yet, so the shop is using the default number <strong>+{{ $fallbackNumber }}</strong>.
+            No numbers saved yet, so the WhatsApp buttons are hidden from the shop.
         </p>
-    @endif
+    @endunless
 
     <form method="POST" action="{{ route('admin.whatsapp.update') }}" class="mt-6 max-w-2xl">
         @csrf

@@ -112,20 +112,12 @@ class WhatsAppChatTest extends TestCase
         $this->get(route('cart'))->assertOk()->assertDontSee('Order via WhatsApp');
     }
 
-    public function test_the_default_number_is_used_until_contacts_are_saved(): void
+    public function test_whatsapp_buttons_are_hidden_until_a_number_is_saved(): void
     {
         WhatsappContact::query()->delete();
-        config(['store.whatsapp' => '13015550100']);
-
-        $this->get(route('home'))->assertSee(route('whatsapp.chat', '13015550100'));
-        $this->get(route('whatsapp.chat', '13015550100'))->assertRedirect('https://wa.me/13015550100?text='.rawurlencode('Hi Njikoka Fashions! I have a question.'));
-    }
-
-    public function test_the_button_is_hidden_without_a_number(): void
-    {
-        WhatsappContact::query()->delete();
-        config(['store.whatsapp' => '']);
+        $product = Product::firstWhere('slug', 'dress-7');
 
         $this->get(route('home'))->assertOk()->assertDontSee('Chat with us');
+        $this->withSession(['cart' => [$product->id => 1]])->get(route('cart'))->assertOk()->assertDontSee('Order via WhatsApp');
     }
 }

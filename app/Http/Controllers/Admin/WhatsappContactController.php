@@ -53,7 +53,7 @@ class WhatsappContactController extends Controller
 
         return view('admin.whatsapp.edit', [
             'slots' => collect(range(0, WhatsappContact::SLOTS - 1))->map(fn (int $index) => $contacts->get($index)),
-            'fallbackNumber' => $contacts->isEmpty() ? config('store.whatsapp') : null,
+            'hasNumbers' => $contacts->isNotEmpty(),
         ]);
     }
 
