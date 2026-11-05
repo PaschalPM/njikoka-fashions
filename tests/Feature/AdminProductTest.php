@@ -109,6 +109,18 @@ class AdminProductTest extends TestCase
             ]);
     }
 
+    public function test_large_photos_are_stored_as_webp_no_wider_than_1600px(): void
+    {
+        Storage::fake('public');
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->post(route('admin.products.store'), $this->productFields(['image' => UploadedFile::fake()->image('phone-photo.jpg', 3000, 2000)]));
+
+        $path = str(Product::where('name', 'Ankara Wrap Dress')->sole()->image)->after('storage/')->value();
+        $this->assertStringEndsWith('.webp', $path);
+        $this->assertSame([1600, 1067], array_slice(getimagesizefromstring(Storage::disk('public')->get($path)), 0, 2));
+    }
+
     public function test_uploads_must_be_images(): void
     {
         $this->actingAs(User::factory()->admin()->create())
@@ -127,7 +139,7 @@ class AdminProductTest extends TestCase
         $product->refresh();
         $this->assertSame(31000, $product->price_cents);
         $this->assertFalse($product->in_stock);
-        $this->assertSame('images/products/Patrick-U-Patrick_R1-01-scaled.jpg', $product->image);
+        $this->assertSame('images/products/Patrick-U-Patrick_R1-01-scaled.webp', $product->image);
         $this->assertSame('dress-7', $product->slug);
     }
 

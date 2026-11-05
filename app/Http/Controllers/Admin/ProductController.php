@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -111,10 +112,49 @@ class ProductController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            $data['image'] = 'storage/'.$request->file('image')->store('products', 'public');
+            $data['image'] = 'storage/'.$this->storeImage($request->file('image'));
         }
 
         return $data;
+    }
+
+    /**
+     * Save an upload as a WebP no larger than 1600px so phone photos don't slow the shop down.
+     * Falls back to the original file when the server's GD build can't decode or write WebP.
+     */
+    private function storeImage(UploadedFile $file): string
+    {
+        $image = function_exists('imagewebp') ? @imagecreatefromstring((string) file_get_contents($file->getRealPath())) : false;
+
+        if (! $image) {
+            return $file->store('products', 'public');
+        }
+
+        $orientation = function_exists('exif_read_data') && in_array($file->getMimeType(), ['image/jpeg', 'image/jpg'], true)
+            ? (@exif_read_data($file->getRealPath())['Orientation'] ?? 1)
+            : 1;
+        $image = match ($orientation) {
+            3 => imagerotate($image, 180, 0),
+            6 => imagerotate($image, -90, 0),
+            8 => imagerotate($image, 90, 0),
+            default => $image,
+        };
+
+        $longestSide = max(imagesx($image), imagesy($image));
+        if ($longestSide > 1600) {
+            $image = imagescale($image, (int) round(imagesx($image) * 1600 / $longestSide), (int) round(imagesy($image) * 1600 / $longestSide));
+        }
+
+        imagepalettetotruecolor($image);
+        imagealphablending($image, false);
+        imagesavealpha($image, true);
+
+        ob_start();
+        imagewebp($image, null, 82);
+        $path = 'products/'.Str::random(40).'.webp';
+        Storage::disk('public')->put($path, (string) ob_get_clean());
+
+        return $path;
     }
 
     private function uniqueSlug(string $name): string

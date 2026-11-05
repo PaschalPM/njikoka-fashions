@@ -32,7 +32,7 @@
     <div class="container-site">
         <div class="flex flex-col items-center gap-6 border-t border-sand py-5 lg:flex-row lg:justify-between lg:py-10">
             <p>&copy; {{ date('Y') }} Njikoka Fashions LLC. All Rights Reserved.</p>
-            <img src="{{ asset('images/site/Frame-1948755515.png') }}" alt="Mastercard, Visa, Cash App, American Express, Discover, JCB, Apple Pay, Google Pay" class="h-auto w-full max-w-[503px]">
+            <img loading="lazy" src="{{ asset('images/site/Frame-1948755515.png') }}" alt="Mastercard, Visa, Cash App, American Express, Discover, JCB, Apple Pay, Google Pay" class="h-auto w-full max-w-[503px]">
         </div>
     </div>
 </footer>

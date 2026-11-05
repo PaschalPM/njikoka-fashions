@@ -1,5 +1,5 @@
 <section class="relative overflow-hidden bg-cocoa text-white">
-    <img src="{{ asset('images/site/Frame-2147226136.png') }}" alt="" loading="lazy" class="absolute inset-0 size-full object-cover">
+    <img src="{{ asset('images/site/Frame-2147226136.webp') }}" alt="" loading="lazy" class="absolute inset-0 size-full object-cover">
     <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent"></div>
     <div class="relative container-site flex min-h-[370px] flex-col justify-center py-12 lg:min-h-[800px]">
         <div class="max-w-xl">

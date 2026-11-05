@@ -1,7 +1,7 @@
 <x-layouts.app>
     {{-- Hero --}}
     <section class="relative overflow-hidden bg-cocoa text-white">
-        <img src="{{ asset('images/site/Frame-2147226244.png') }}" alt="" class="absolute inset-0 size-full object-cover object-[70%_center] lg:object-left">
+        <img fetchpriority="high" src="{{ asset('images/site/Frame-2147226244.webp') }}" alt="" class="absolute inset-0 size-full object-cover object-[70%_center] lg:object-left">
         <div class="absolute inset-0 bg-black/40 lg:bg-black/[0.38]"></div>
         <div class="relative flex min-h-[390px] flex-col justify-end px-[10px] pt-[160px] pb-5 lg:min-h-[1028px] lg:px-0 lg:pt-[300px] lg:pb-[50px]">
             <div class="text-center lg:max-w-[720px] lg:pl-[10px] lg:text-left">
@@ -30,16 +30,16 @@
 
             <div class="mt-5 grid gap-[10px] lg:mt-[60px] lg:grid-cols-3 lg:gap-10">
                 <div class="space-y-5 lg:space-y-[30px]">
-                    <img src="{{ asset('images/site/Rectangle-14.png') }}" alt="" class="w-full rounded-[25px] object-cover">
+                    <img loading="lazy" src="{{ asset('images/site/Rectangle-14.webp') }}" alt="" class="w-full rounded-[25px] object-cover">
                     <div class="space-y-[14px] text-center text-base leading-6 lg:text-left lg:text-[18px] lg:leading-[27px]">
                         <p>Njikoka Fashions creates elegant styles using tropical fabrics, expressive patterns, and thoughtful design. Each piece is made to help adults and children feel confident, comfortable, and beautifully dressed for life’s everyday and special moments.</p>
                         <p>From bold prints to polished silhouettes, our fashion is created for people who want clothing with personality, meaning, and presence.</p>
                     </div>
                 </div>
-                <img src="{{ asset('images/site/Rectangle-15.png') }}" alt="" class="w-full rounded-[25px] object-cover lg:h-[634px]">
+                <img loading="lazy" src="{{ asset('images/site/Rectangle-15.webp') }}" alt="" class="w-full rounded-[25px] object-cover lg:h-[634px]">
                 <div class="flex flex-col-reverse gap-5 lg:flex-col lg:pt-[80px]">
                     @include('partials.checklist')
-                    <img src="{{ asset('images/site/Rectangle-16.png') }}" alt="" class="w-full rounded-[25px] object-cover">
+                    <img loading="lazy" src="{{ asset('images/site/Rectangle-16.webp') }}" alt="" class="w-full rounded-[25px] object-cover">
                 </div>
             </div>
         </div>
@@ -54,9 +54,9 @@
             </div>
 
             @foreach ([
-                ['Custom Designs', 'Bring your fashion idea to life with custom pieces made around your vision.', 'Custom Design', route('custom-designs'), 'Frame-1948754955-1.png', 'lg:row-start-2 lg:col-start-1 lg:min-h-[526px]'],
-                ['Children’s fashion', 'Elegant tropical fashion for personal style, events, and everyday confidence.', 'Shop Adults', route('shop'), 'Frame-1948754956-1.png', 'lg:row-start-2 lg:col-start-2 lg:min-h-[660px]'],
-                ['Adults Collection', 'Elegant tropical fashion for personal style, events, and everyday confidence.', 'Shop Adults', route('shop'), 'Frame-1948754950.png', 'lg:row-span-2 lg:row-start-1 lg:col-start-3 lg:ml-5 lg:min-h-[739px]'],
+                ['Custom Designs', 'Bring your fashion idea to life with custom pieces made around your vision.', 'Custom Design', route('custom-designs'), 'Frame-1948754955-1.webp', 'lg:row-start-2 lg:col-start-1 lg:min-h-[526px]'],
+                ['Children’s fashion', 'Elegant tropical fashion for personal style, events, and everyday confidence.', 'Shop Adults', route('shop'), 'Frame-1948754956-1.webp', 'lg:row-start-2 lg:col-start-2 lg:min-h-[660px]'],
+                ['Adults Collection', 'Elegant tropical fashion for personal style, events, and everyday confidence.', 'Shop Adults', route('shop'), 'Frame-1948754950.webp', 'lg:row-span-2 lg:row-start-1 lg:col-start-3 lg:ml-5 lg:min-h-[739px]'],
             ] as [$heading, $copy, $cta, $url, $image, $placement])
                 <div class="relative flex min-h-[350px] flex-col justify-end self-end overflow-hidden rounded-[25px] p-[15px] lg:p-5 lg:pb-[30px] {{ $placement }}">
                     <img src="{{ asset('images/site/'.$image) }}" alt="" loading="lazy" class="absolute inset-0 size-full object-cover">
@@ -137,7 +137,7 @@
                     ['Group-3.png', 'Made to Stand Out', 'Each look is created to help you feel confident, polished, and beautifully dressed for life’s special moments.'],
                 ] as [$icon, $heading, $copy])
                     <div class="flex min-h-[250px] flex-col items-center justify-between border border-sand p-[15px] text-center transition hover:bg-white lg:min-h-[350px] lg:items-start lg:border-y-0 lg:border-l-0 lg:p-5 lg:pl-[30px] lg:text-left lg:first:pl-[10px]">
-                        <img src="{{ asset('images/site/'.$icon) }}" alt="" class="h-10 w-auto object-contain">
+                        <img loading="lazy" src="{{ asset('images/site/'.$icon) }}" alt="" class="h-10 w-auto object-contain">
                         <div>
                             <h3 class="text-[20px] leading-[20px] lg:text-[30px] lg:leading-[30px]">{{ $heading }}</h3>
                             <p class="mt-[10px] text-base leading-6 lg:mt-[22px] lg:text-[18px] lg:leading-[27px]">{{ $copy }}</p>
@@ -151,7 +151,7 @@
     {{-- Signature look + custom services --}}
     <section class="bg-cream lg:flex">
         <div class="relative flex min-h-[400px] flex-col justify-end overflow-hidden p-5 lg:min-h-[1203px] lg:w-[48.54%] lg:p-[30px]">
-            <img src="{{ asset('images/site/Frame-2147226021.png') }}" alt="" loading="lazy" class="absolute inset-0 size-full object-cover">
+            <img src="{{ asset('images/site/Frame-2147226021.webp') }}" alt="" loading="lazy" class="absolute inset-0 size-full object-cover">
             <div class="relative flex flex-col items-center gap-[10px] rounded-[35px] border border-white/60 bg-[#6b605a]/75 p-[15px] text-center backdrop-blur-[2px] lg:flex-row lg:items-end lg:justify-between lg:gap-5 lg:p-[30px] lg:text-left">
                 <div class="lg:max-w-[340px]">
                     <h2 class="text-[26px] leading-[26px] text-cream lg:text-[35px] lg:leading-[35px]">Let’s Create Your Signature Look</h2>
@@ -182,7 +182,7 @@
 
     {{-- Final CTA --}}
     <section class="relative overflow-hidden bg-cocoa text-white">
-        <img src="{{ asset('images/site/Frame-2147226136.png') }}" alt="" loading="lazy" class="absolute inset-0 size-full object-cover object-[70%_center]">
+        <img src="{{ asset('images/site/Frame-2147226136.webp') }}" alt="" loading="lazy" class="absolute inset-0 size-full object-cover object-[70%_center]">
         <div class="absolute inset-0 bg-[#2b1d18]/70 lg:bg-transparent lg:bg-gradient-to-r lg:from-[#2b1d18]/85 lg:via-[#2b1d18]/35 lg:via-40% lg:to-transparent lg:to-75%"></div>
         <div class="relative container-site flex min-h-[370px] flex-col items-center justify-center gap-5 py-5 text-center lg:min-h-[800px] lg:flex-row lg:items-center lg:justify-between lg:pt-[300px] lg:pb-[50px] lg:text-left">
             <div class="flex flex-col items-center lg:items-start">

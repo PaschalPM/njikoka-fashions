@@ -7,7 +7,7 @@
         <div class="mx-auto max-w-[1340px] px-[10px] pt-[50px] pb-[100px] lg:px-0">
             <div class="grid gap-10 lg:grid-cols-2">
                 <div class="flex items-start justify-center">
-                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="aspect-square w-full max-w-[325px] object-cover">
+                    <img fetchpriority="high" src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="aspect-square w-full max-w-[325px] object-cover">
                 </div>
 
                 <div>
