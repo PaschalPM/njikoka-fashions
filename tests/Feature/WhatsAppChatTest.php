@@ -24,6 +24,19 @@ class WhatsAppChatTest extends TestCase
             ->assertSee(route('whatsapp.chat', '2347031102089'));
     }
 
+    public function test_contact_and_returns_pages_list_the_saved_contacts(): void
+    {
+        WhatsappContact::query()->delete();
+        WhatsappContact::factory()->create(['label' => 'Ada', 'number' => '2348035550101']);
+
+        foreach (['contact', 'returns'] as $page) {
+            $this->get(route($page))
+                ->assertSee('Ada: +2348035550101')
+                ->assertSee(route('whatsapp.chat', '2348035550101'))
+                ->assertDontSee('301-968-0567');
+        }
+    }
+
     public function test_chat_opens_whatsapp_with_a_greeting_and_is_recorded(): void
     {
         $this->get(route('whatsapp.chat', '2348135438144'))

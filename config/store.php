@@ -8,12 +8,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | Business contact details shown in the footer and on the contact page.
+    | Phone numbers come from the WhatsApp contacts managed in the admin.
     |
     */
 
     'email' => env('STORE_EMAIL', 'africanconfluence@gmail.com'),
-
-    'phones' => array_filter(explode(',', env('STORE_PHONES', '301-968-0567,227-256-0003'))),
 
     'address' => env('STORE_ADDRESS', '14502 Greenview Drive Laurel, Maryland 20708'),
 

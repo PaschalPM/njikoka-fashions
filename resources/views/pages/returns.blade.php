@@ -48,7 +48,13 @@
 
             <h3>How to Request a Return or Exchange</h3>
             <ol>
-                <li>Email us at <a href="mailto:{{ config('store.email') }}">{{ config('store.email') }}</a> or calls us at <a href="tel:3019680567">301-968-0567</a> with your order number.</li>
+                <li>Email us at <a href="mailto:{{ config('store.email') }}">{{ config('store.email') }}</a> @if ($whatsappContacts->isNotEmpty())
+                    or message us on WhatsApp at
+                    @foreach ($whatsappContacts as $contact)
+                        <a href="{{ route('whatsapp.chat', $contact->number) }}" target="_blank" rel="nofollow noopener">{{ $contact->label }}: {{ $contact->displayNumber() }}</a>{{ $loop->last ? '' : ',' }}
+                    @endforeach
+                @endif
+                with your order number.</li>
                 <li>Tell us the item(s), the reason for return, and whether you’d like an exchange, store credit, or refund. Attach photos if the item is damaged.</li>
                 <li>Once approved, we will share return instructions and the return address.</li>
                 <li>Pack the item securely in its original packaging with tags attached.</li>

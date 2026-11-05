@@ -33,6 +33,9 @@ class AppServiceProvider extends ServiceProvider
             'newAppointments' => Appointment::where('status', 'new')->count(),
         ]));
 
-        View::composer('components.layouts.app', fn ($view) => $view->with('whatsappContacts', WhatsappContact::forStorefront()));
+        View::composer(
+            ['components.layouts.app', 'partials.contact-details', 'pages.returns'],
+            fn ($view) => $view->with('whatsappContacts', WhatsappContact::forStorefront()),
+        );
     }
 }
