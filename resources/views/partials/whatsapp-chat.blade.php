@@ -26,7 +26,7 @@
                 @if ($product instanceof \App\Models\Product)
                     Questions about <strong>{{ $product->name }}</strong>? Sizing, fabric or delivery, we're happy to help.
                 @else
-                    How can we help you? Ask us about sizing, your order, or any Nigerian outfit you’d like made.
+                    How can we help you? Ask us about sizing, your order, or any outfit you’d like made, Nigerian or otherwise.
                 @endif
             </p>
         </div>

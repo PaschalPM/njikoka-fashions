@@ -30,7 +30,7 @@
                     <p class="mt-[45px] text-[24px] font-bold text-black">{{ $product->formattedPrice() }} <span class="text-[17px] font-normal text-ink/60">({{ $product->formattedUsdPrice() }})</span></p>
                     @include('partials.price-note', ['class' => 'mt-2 max-w-[460px] text-sm text-ink/60'])
                     <p class="mt-3 max-w-[460px] rounded-xl bg-linen px-4 py-3 text-sm text-cocoa">
-                        Want it in another fabric or colour, or a different style altogether? We can make any Nigerian attire for you.
+                        Want it in another fabric or colour, or something different altogether? We make any Nigerian attire, plus gowns, suits and other styles.
                         <a href="{{ route('custom-designs') }}" class="font-bold whitespace-nowrap text-forest underline-offset-4 hover:underline">Request a custom design &rarr;</a>
                     </p>
 

@@ -36,9 +36,9 @@ class AdminProductTest extends TestCase
         $this->actingAs(User::factory()->admin()->create())
             ->get(route('admin.products.index'))
             ->assertOk()
-            ->assertSee('Lime Ankara Wrapper Set')
-            ->assertSee('₦140,000')
-            ->assertSee('$112');
+            ->assertSee('Burgundy Velvet Gown with Cape')
+            ->assertSee('₦200,000')
+            ->assertSee('$160');
     }
 
     public function test_admin_home_opens_the_product_list(): void
@@ -50,19 +50,19 @@ class AdminProductTest extends TestCase
 
     public function test_admin_can_filter_products_by_name_category_and_stock(): void
     {
-        Product::where('slug', 'dress-12')->update(['in_stock' => false]);
+        Product::where('slug', 'burgundy-velvet-gown-with-cape')->update(['in_stock' => false]);
         $this->actingAs(User::factory()->admin()->create());
 
-        $this->get(route('admin.products.index', ['q' => 'Lime']))
-            ->assertSee('Lime Ankara Wrapper Set')
+        $this->get(route('admin.products.index', ['q' => 'Velvet']))
+            ->assertSee('Burgundy Velvet Gown with Cape')
             ->assertDontSee('Coral Bead Print Wrapper Set');
 
         $this->get(route('admin.products.index', ['category' => Category::where('slug', 'men')->value('id')]))
             ->assertSee('₦175,000')
-            ->assertDontSee('Lime Ankara Wrapper Set');
+            ->assertDontSee('Burgundy Velvet Gown with Cape');
 
         $this->get(route('admin.products.index', ['stock' => 'out']))
-            ->assertSee('Lime Ankara Wrapper Set')
+            ->assertSee('Burgundy Velvet Gown with Cape')
             ->assertDontSee('Isiagu Maiden Dress');
     }
 

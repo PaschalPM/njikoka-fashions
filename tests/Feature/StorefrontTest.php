@@ -9,6 +9,7 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Stripe\Checkout\Session;
 use Stripe\Service\Checkout\CheckoutServiceFactory;
 use Stripe\Service\Checkout\SessionService;
@@ -41,10 +42,51 @@ class StorefrontTest extends TestCase
 
     public function test_shop_filters_by_category(): void
     {
-        $this->get(route('shop', ['categories' => ['women'], 'q' => 'Ankara']))
+        $this->get(route('shop', ['categories' => ['women'], 'q' => 'Set']))
             ->assertOk()
-            ->assertSee('Lime Ankara Wrapper Set')
-            ->assertDontSee('Isiagu Maiden Dress');
+            ->assertSee('Akwete Wrap Skirt Set')
+            ->assertDontSee('Beige Button-Front Senator Set');
+    }
+
+    public function test_the_shop_filters_by_style(): void
+    {
+        $this->get(route('shop', ['styles' => ['babban-riga']]))
+            ->assertOk()
+            ->assertSee('Sky Blue Babban Riga with Geometric Embroidery')
+            ->assertSee('Ivory Babban Riga with Embroidered Front')
+            ->assertDontSee('Grey Long-Sleeve Senator with Black Embroidery');
+    }
+
+    #[DataProvider('babbanRigaSpellings')]
+    public function test_searching_another_spelling_of_a_style_selects_that_style(string $search): void
+    {
+        $this->get(route('shop', ['q' => $search]))
+            ->assertOk()
+            ->assertSee('Sky Blue Babban Riga with Geometric Embroidery')
+            ->assertDontSee('Grey Long-Sleeve Senator with Black Embroidery');
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function babbanRigaSpellings(): array
+    {
+        return ['hyphenated' => ['baban-riga'], 'one word' => ['Babanriga'], 'babbar' => ['babbar riga']];
+    }
+
+    public function test_style_chips_show_counts_and_hide_styles_with_no_products(): void
+    {
+        $this->get(route('shop'))
+            ->assertSee('Shop by style', false)
+            ->assertSee(route('shop', ['styles' => ['babban-riga']]), false)
+            ->assertDontSee(route('shop', ['styles' => ['agbada']]), false);
+    }
+
+    public function test_free_text_search_also_matches_descriptions(): void
+    {
+        $this->get(route('shop', ['q' => 'aso ebi']))
+            ->assertSee('Silver Lace Mermaid Gown with Gele')
+            ->assertDontSee('Sky Blue Babban Riga with Geometric Embroidery');
     }
 
     public function test_product_pages_credit_photos_that_need_attribution(): void
@@ -62,13 +104,14 @@ class StorefrontTest extends TestCase
     public function test_the_shop_and_product_pages_offer_any_nigerian_attire_made_to_order(): void
     {
         $this->get(route('shop'))
-            ->assertSee('Don’t see your style? We make any Nigerian attire.')
+            ->assertSee('Don’t see your style? We’ll make it.')
+            ->assertSee('Evening gowns')
             ->assertSee(route('custom-designs'))
             ->assertSee(route('whatsapp.chat', '2348135438144'));
 
         $this->get(route('shop', ['q' => 'no such outfit']))->assertSee('Can’t find it? We can make it for you.');
 
-        $this->get(route('product', 'dress-7'))->assertSee('We can make any Nigerian attire for you.');
+        $this->get(route('product', 'dress-7'))->assertSee('We make any Nigerian attire, plus gowns, suits and other styles.');
     }
 
     public function test_products_can_be_added_to_the_cart(): void

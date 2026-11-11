@@ -163,10 +163,11 @@
 
         <div class="px-[10px] py-[30px] text-center lg:flex lg:w-[51.46%] lg:flex-col lg:justify-center lg:pt-[100px] lg:pr-[50px] lg:pb-[100px] lg:pl-[70px] lg:text-left">
             <h2 class="text-[26px] leading-[26px] lg:max-w-[620px] lg:text-[70px] lg:leading-[70px]">Need Something Made Just for You?</h2>
-            <p class="mx-auto mt-[10px] text-base leading-6 lg:mx-0 lg:mt-[30px] lg:max-w-[420px] lg:text-[18px] lg:leading-[27px]">We can make any Nigerian attire, from agbada and Isiagu to iro and buba and aso ebi. Book a consultation for custom fashion, family looks, children’s pieces, event outfits, or personal style guidance.</p>
+            <p class="mx-auto mt-[10px] text-base leading-6 lg:mx-0 lg:mt-[30px] lg:max-w-[420px] lg:text-[18px] lg:leading-[27px]">We make any Nigerian attire, from agbada and Isiagu to iro and buba and aso ebi, as well as gowns, suits and everyday wear. Book a consultation for custom fashion, family looks, children’s pieces, event outfits, or personal style guidance.</p>
             <div class="mt-[10px] lg:mt-[30px]">
                 @foreach ([
                     ['Any Nigerian Attire', 'Agbada, buba and sokoto, Isiagu, iro and buba, George and Akwete wrappers, gele and more, made in your choice of fabric.'],
+                    ['Gowns, Suits & Beyond', 'Not just Nigerian styles: evening and reception gowns, bridal looks, suits, corporate and everyday wear.'],
                     ['Custom Adult Fashion', 'Personalized tropical-inspired pieces designed around your occasion, style, and fit.'],
                     ['Children’s Custom Pieces', 'Colorful, comfortable fashion for children with personality, movement, and charm.'],
                     ['Family Matching Looks', 'Styles for family photos, celebrations, cultural moments, and special events.'],

@@ -3,8 +3,8 @@
 
     <section class="bg-white px-[10px] py-[30px] lg:pt-[80px] lg:pb-[80px]">
         <div class="mx-auto mb-8 max-w-[700px] text-center">
-            <h2 class="text-[28px] leading-tight lg:text-[40px]">We can make any Nigerian attire</h2>
-            <p class="mt-3 text-base leading-6 text-[#555] lg:text-[18px] lg:leading-[27px]">Agbada, buba and sokoto, kaftans and senators, Isiagu, iro and buba, George and Akwete wrappers, Ankara gowns, bubu, gele and full aso ebi orders. Pick a style below, or describe something new, and we’ll make it in your choice of fabric and colour.</p>
+            <h2 class="text-[28px] leading-tight lg:text-[40px]">Nigerian attire and beyond, made for you</h2>
+            <p class="mt-3 text-base leading-6 text-[#555] lg:text-[18px] lg:leading-[27px]">We make any Nigerian attire: agbada, babban riga, buba and sokoto, kaftans and senators, Isiagu, iro and buba, George and Akwete wrappers, Ankara gowns, bubu, gele and full aso ebi orders. We also make evening and reception gowns, bridal looks, suits, corporate and everyday wear. Pick a style below, or describe something new, and we’ll make it in your choice of fabric and colour.</p>
         </div>
         <form method="POST" action="{{ route('custom-designs.store') }}" class="mx-auto max-w-[700px] rounded-2xl border border-[#e6e6e6] bg-[#fcfbf9] p-5 shadow-[0_10px_30px_rgba(0,0,0,0.04)] sm:p-10">
             @csrf

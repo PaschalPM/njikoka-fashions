@@ -31,12 +31,34 @@ return [
     'time_slots' => ['09:00 AM', '11:00 AM', '02:00 PM', '04:00 PM'],
 
     'garment_types' => [
-        'Agbada', 'Buba and Sokoto', 'Kaftan / Senator', 'Isiagu Set', 'Iro and Buba', 'Wrapper Set (George, Akwete, Ankara)',
+        'Agbada', 'Babban Riga', 'Buba and Sokoto', 'Kaftan / Senator', 'Isiagu Set', 'Iro and Buba', 'Wrapper Set (George, Akwete, Ankara)',
         'Bubu / Kaftan Dress', 'Aso Ebi (Group Order)', 'Gele / Ichafu', 'Children’s Traditional Wear',
-        'Dress / Gown', 'Suit / Tuxedo', 'Shirt / Blouse', 'Jacket / Outerwear', 'Trousers / Skirt', 'Other',
+        'Evening / Reception Gown', 'Bridal Gown', 'Dress / Gown', 'Suit / Tuxedo', 'Corporate / Office Wear', 'Casual Wear',
+        'Shirt / Blouse', 'Jacket / Outerwear', 'Trousers / Skirt', 'Other',
     ],
 
-    'fabrics' => ['Ankara', 'Lace', 'Aso-Oke', 'George', 'Adire', 'Akwete', 'Isiagu', 'Cotton', 'Silk', 'Wool', 'Linen', 'Satin / Velvet'],
+    'fabrics' => ['Ankara', 'Lace', 'Aso-Oke', 'George', 'Adire', 'Akwete', 'Isiagu', 'Sequins', 'Chiffon / Tulle', 'Cotton', 'Silk', 'Wool', 'Linen', 'Satin / Velvet'],
+
+    /*
+    | Style filters on the shop page. A product matches a style when its name or
+    | summary contains one of the keywords. Aliases are other spellings shoppers
+    | type into search (e.g. "baban-riga"), which then select that style.
+    */
+
+    'styles' => [
+        'babban-riga' => ['label' => 'Babban riga', 'keywords' => ['babban riga'], 'aliases' => ['baban riga', 'babanriga', 'babbanriga', 'babbar riga', 'riga', 'grand boubou']],
+        'senator' => ['label' => 'Senator & kaftan', 'keywords' => ['senator', 'long kaftan'], 'aliases' => ['kaftan', 'caftan']],
+        'isiagu' => ['label' => 'Isiagu', 'keywords' => ['isiagu'], 'aliases' => ['isi agu', 'chieftaincy']],
+        'iro-and-buba' => ['label' => 'Iro and buba', 'keywords' => ['buba'], 'aliases' => ['iro', 'iro and buba', 'buba and iro', 'iro buba']],
+        'wrappers' => ['label' => 'Wrappers', 'keywords' => ['wrapper'], 'aliases' => ['wrappers', 'george', 'akwete', 'madras', 'obiakwa', 'double wrapper']],
+        'gowns' => ['label' => 'Gowns', 'keywords' => ['gown'], 'aliases' => ['gowns', 'evening gown', 'ball gown', 'mermaid']],
+        'gele' => ['label' => 'Gele & head ties', 'keywords' => ['gele', 'ichafu', 'head tie', 'turban'], 'aliases' => ['headtie', 'head wrap', 'headwrap']],
+        'lace' => ['label' => 'Lace', 'keywords' => ['lace'], 'aliases' => []],
+        'sequins' => ['label' => 'Sequins', 'keywords' => ['sequin'], 'aliases' => ['sequins', 'sequinned']],
+        'bubu' => ['label' => 'Bubu', 'keywords' => ['bubu'], 'aliases' => ['boubou', 'kaftan dress']],
+        'coral-beads' => ['label' => 'Coral beads', 'keywords' => ['coral'], 'aliases' => ['beads', 'coral beads', 'aka olu']],
+        'agbada' => ['label' => 'Agbada', 'keywords' => ['agbada'], 'aliases' => []],
+    ],
 
     'currency' => env('STORE_CURRENCY', 'usd'),
 
