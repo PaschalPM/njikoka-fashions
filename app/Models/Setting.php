@@ -29,4 +29,17 @@ class Setting extends Model
     {
         static::updateOrCreate(['key' => 'ngn_per_usd'], ['value' => (string) $rate]);
     }
+
+    /**
+     * Percentage added on top of the converted dollar price.
+     */
+    public static function usdMarkupPercent(): int
+    {
+        return (int) (static::find('usd_markup_percent')?->value ?? config('store.usd_markup_percent'));
+    }
+
+    public static function setUsdMarkupPercent(int $percent): void
+    {
+        static::updateOrCreate(['key' => 'usd_markup_percent'], ['value' => (string) $percent]);
+    }
 }

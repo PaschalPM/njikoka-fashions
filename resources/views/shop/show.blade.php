@@ -6,9 +6,18 @@
     <section class="bg-cream font-system text-base leading-normal text-ink">
         <div class="mx-auto max-w-[1340px] px-[10px] pt-[50px] pb-[100px] lg:px-0">
             <div class="grid gap-10 lg:grid-cols-2">
-                <div class="flex items-start justify-center">
-                    <img fetchpriority="high" src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="aspect-square w-full max-w-[325px] object-cover object-[50%_20%]">
-                </div>
+                <figure class="flex flex-col items-center">
+                    <img fetchpriority="high" src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="aspect-[2/3] w-full max-w-[400px] object-cover object-[50%_20%]">
+                    @if ($product->image_credit)
+                        <figcaption class="mt-2 max-w-[400px] text-center text-xs text-ink/50">
+                            @if ($product->image_credit_url)
+                                <a href="{{ $product->image_credit_url }}" target="_blank" rel="noopener" class="hover:underline">{{ $product->image_credit }}</a>
+                            @else
+                                {{ $product->image_credit }}
+                            @endif
+                        </figcaption>
+                    @endif
+                </figure>
 
                 <div>
                     <nav class="text-[15px] text-[#767676]" aria-label="Breadcrumb">
@@ -20,6 +29,10 @@
                     @endif
                     <p class="mt-[45px] text-[24px] font-bold text-black">{{ $product->formattedPrice() }} <span class="text-[17px] font-normal text-ink/60">({{ $product->formattedUsdPrice() }})</span></p>
                     @include('partials.price-note', ['class' => 'mt-2 max-w-[460px] text-sm text-ink/60'])
+                    <p class="mt-3 max-w-[460px] rounded-xl bg-linen px-4 py-3 text-sm text-cocoa">
+                        Want it in another fabric or colour, or a different style altogether? We can make any Nigerian attire for you.
+                        <a href="{{ route('custom-designs') }}" class="font-bold whitespace-nowrap text-forest underline-offset-4 hover:underline">Request a custom design &rarr;</a>
+                    </p>
 
                     @if ($product->in_stock)
                         <form method="POST" action="{{ route('cart.store', $product) }}" class="mt-[30px] flex items-center gap-[14px]">
@@ -47,7 +60,7 @@
 
                 <div role="tabpanel" data-panel="description" class="px-5 pt-[30px]">
                     <h2 class="font-system text-[30px] leading-[1.2] text-ink">Description</h2>
-                    <div class="mt-5 space-y-[14px]">{!! $product->description ?? '' !!}</div>
+                    <div class="mt-5 space-y-[14px] [&_li]:mt-1 [&_ul]:list-disc [&_ul]:pl-5">{!! $product->description ?? '' !!}</div>
                 </div>
 
                 <div role="tabpanel" data-panel="reviews" id="reviews" class="hidden px-5 pt-[30px]">

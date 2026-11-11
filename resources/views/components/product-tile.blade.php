@@ -2,7 +2,7 @@
 
 {{-- Compact card for the cart and favorites pages: photo with heart, price and a single add-to-cart action. --}}
 <article @if ($removeOnUnsave) data-wishlist-item @endif class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_6px_20px_rgba(43,29,24,0.06)] transition duration-300 data-leaving:scale-95 data-leaving:opacity-0">
-    <div class="relative aspect-[4/5] overflow-hidden bg-linen">
+    <div class="relative aspect-[2/3] overflow-hidden bg-linen">
         <a href="{{ route('product', $product) }}" class="block size-full">
             <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" loading="lazy" class="size-full object-cover object-[50%_20%] transition duration-500 group-hover:scale-[1.03]">
         </a>

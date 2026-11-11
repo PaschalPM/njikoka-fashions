@@ -27,7 +27,7 @@ class StorefrontTest extends TestCase
             $this->get(route($route))->assertOk();
         }
 
-        $this->get(route('product', 'dress-1'))->assertOk()->assertSee('₦150,000')->assertSee('$100')
+        $this->get(route('product', 'dress-1'))->assertOk()->assertSee('₦190,000')->assertSee('$152')
             ->assertSee('Prices include materials, workmanship and delivery.');
     }
 
@@ -44,7 +44,31 @@ class StorefrontTest extends TestCase
         $this->get(route('shop', ['categories' => ['women'], 'q' => 'Ankara']))
             ->assertOk()
             ->assertSee('Lime Ankara Wrapper Set')
-            ->assertDontSee('Festival Print Head Wrap');
+            ->assertDontSee('Isiagu Maiden Dress');
+    }
+
+    public function test_product_pages_credit_photos_that_need_attribution(): void
+    {
+        Product::where('slug', 'dress-7')->update(['image_credit' => 'Photo: Ada Obi, CC BY-SA 4.0', 'image_credit_url' => 'https://example.com/photo']);
+
+        $this->get(route('product', 'dress-7'))
+            ->assertOk()
+            ->assertSee('Photo: Ada Obi, CC BY-SA 4.0')
+            ->assertSee('href="https://example.com/photo"', false);
+
+        $this->get(route('product', 'dress-1'))->assertOk()->assertDontSee('<figcaption', false);
+    }
+
+    public function test_the_shop_and_product_pages_offer_any_nigerian_attire_made_to_order(): void
+    {
+        $this->get(route('shop'))
+            ->assertSee('Don’t see your style? We make any Nigerian attire.')
+            ->assertSee(route('custom-designs'))
+            ->assertSee(route('whatsapp.chat', '2348135438144'));
+
+        $this->get(route('shop', ['q' => 'no such outfit']))->assertSee('Can’t find it? We can make it for you.');
+
+        $this->get(route('product', 'dress-7'))->assertSee('We can make any Nigerian attire for you.');
     }
 
     public function test_products_can_be_added_to_the_cart(): void
@@ -53,7 +77,7 @@ class StorefrontTest extends TestCase
 
         $this->post(route('cart.store', $product), ['quantity' => 2])->assertRedirect();
 
-        $this->get(route('cart'))->assertSee('Golden Kente Crop Set')->assertSee('₦360,000')->assertSee('$240 by card');
+        $this->get(route('cart'))->assertSee('Peach Lace Buba and Iro')->assertSee('₦360,000')->assertSee('$288 by card');
     }
 
     public function test_checkout_shows_the_naira_total_and_the_dollar_card_charge(): void
@@ -63,7 +87,7 @@ class StorefrontTest extends TestCase
         $this->withSession(['cart' => [$product->id => 2]])
             ->get(route('checkout'))
             ->assertOk()
-            ->assertSeeInOrder(['Total', '₦360,000', 'Charged by card in US dollars', '$240']);
+            ->assertSeeInOrder(['Total', '₦360,000', 'Charged by card in US dollars', '$288']);
     }
 
     public function test_checkout_creates_an_order_and_redirects_to_stripe(): void
@@ -72,7 +96,7 @@ class StorefrontTest extends TestCase
         $sessions = $this->fakeStripeSessions();
 
         $sessions->shouldReceive('create')->once()
-            ->withArgs(fn ($params) => $params['line_items'][0]['price_data']['unit_amount'] === 12000
+            ->withArgs(fn ($params) => $params['line_items'][0]['price_data']['unit_amount'] === 14400
                 && $params['line_items'][0]['quantity'] === 2)
             ->andReturn(Session::constructFrom(['id' => 'cs_test_123', 'url' => 'https://checkout.stripe.com/c/pay/cs_test_123']));
 
@@ -81,7 +105,7 @@ class StorefrontTest extends TestCase
             ->assertRedirect('https://checkout.stripe.com/c/pay/cs_test_123');
 
         $order = Order::with('items')->sole();
-        $this->assertSame(24000, $order->total_cents);
+        $this->assertSame(28800, $order->total_cents);
         $this->assertSame('cs_test_123', $order->stripe_session_id);
         $this->assertSame('pending', $order->status);
         $this->assertSame(2, $order->items->first()->quantity);

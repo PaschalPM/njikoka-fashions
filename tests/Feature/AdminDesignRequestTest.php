@@ -33,6 +33,21 @@ class AdminDesignRequestTest extends TestCase
             ->assertSee('1<span class="sr-only"> new</span>', false);
     }
 
+    public function test_customers_can_request_nigerian_attire_and_fabrics(): void
+    {
+        $this->post(route('custom-designs.store'), [
+            'first_name' => 'Ada',
+            'last_name' => 'Obi',
+            'email' => 'ada@example.com',
+            'garment_type' => 'Agbada',
+            'fabrics' => ['Aso-Oke', 'Lace'],
+            'description' => 'A three-piece agbada for my father’s 70th birthday.',
+        ])->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('design_requests', ['garment_type' => 'Agbada']);
+        $this->assertSame(['Aso-Oke', 'Lace'], DesignRequest::sole()->fabrics);
+    }
+
     public function test_customers_cannot_see_design_requests(): void
     {
         $this->actingAs(User::factory()->create())

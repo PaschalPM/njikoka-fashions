@@ -54,7 +54,7 @@ class WhatsAppChatTest extends TestCase
         $this->get(route('product', $product))->assertSee(route('whatsapp.chat', ['2348135438144', 'product' => 'dress-7']), false);
 
         $this->get(route('whatsapp.chat', ['2348135438144', 'product' => 'dress-7']))
-            ->assertRedirect('https://wa.me/2348135438144?text='.rawurlencode("Hi Njikoka Fashions! I'm interested in Golden Kente Crop Set: ".route('product', 'dress-7')));
+            ->assertRedirect('https://wa.me/2348135438144?text='.rawurlencode("Hi Njikoka Fashions! I'm interested in Peach Lace Buba and Iro: ".route('product', 'dress-7')));
 
         $this->assertSame($product->id, WhatsappClick::sole()->product_id);
     }
@@ -101,16 +101,16 @@ class WhatsAppChatTest extends TestCase
         [$dress7, $dress8] = Product::whereIn('slug', ['dress-7', 'dress-8'])->orderBy('slug')->get();
 
         $message = "Hi Njikoka Fashions! I'd like to order:\n\n"
-            ."• Golden Kente Crop Set × 2: ₦360,000 (about $240)\n  ".route('product', $dress7)."\n"
-            ."• Indigo Stripe Wrap Set × 1: ₦150,000 (about $100)\n  ".route('product', $dress8)
-            ."\n\nTotal: ₦510,000 (about $340)\n\nCould you help me complete this order?";
+            ."• Peach Lace Buba and Iro × 2: ₦360,000 (about $288)\n  ".route('product', $dress7)."\n"
+            ."• Akwete Wrap Skirt Set × 1: ₦150,000 (about $120)\n  ".route('product', $dress8)
+            ."\n\nTotal: ₦510,000 (about $408)\n\nCould you help me complete this order?";
 
         $this->withSession(['cart' => [$dress7->id => 2, $dress8->id => 1]])
             ->get(route('whatsapp.order', '2347031102089'))
             ->assertRedirect('https://wa.me/2347031102089?text='.rawurlencode($message));
 
         $click = WhatsappClick::sole();
-        $this->assertSame(['Paschal', 'order', 3, 34000], [$click->contact_label, $click->source, $click->cart_items, $click->cart_total_cents]);
+        $this->assertSame(['Paschal', 'order', 3, 40800], [$click->contact_label, $click->source, $click->cart_items, $click->cart_total_cents]);
     }
 
     public function test_an_order_with_an_empty_cart_goes_back_to_the_cart(): void

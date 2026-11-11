@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['category_id', 'name', 'slug', 'summary', 'description', 'price_naira', 'price_cents', 'image', 'in_stock'])]
+#[Fillable(['category_id', 'name', 'slug', 'summary', 'description', 'price_naira', 'price_cents', 'image', 'image_credit', 'image_credit_url', 'in_stock'])]
 class Product extends Model
 {
     protected function casts(): array
@@ -49,11 +49,13 @@ class Product extends Model
     }
 
     /**
-     * Whole-dollar price in cents for a naira amount at the admin's exchange rate.
+     * Whole-dollar price in cents for a naira amount: converted at the admin's exchange rate, then marked up by the admin's percentage.
      */
-    public static function usdCentsFor(int $naira, ?int $ngnPerUsd = null): int
+    public static function usdCentsFor(int $naira, ?int $ngnPerUsd = null, ?int $markupPercent = null): int
     {
-        return max(1, (int) round($naira / ($ngnPerUsd ?? Setting::ngnPerUsd()))) * 100;
+        $dollars = $naira / ($ngnPerUsd ?? Setting::ngnPerUsd()) * (100 + ($markupPercent ?? Setting::usdMarkupPercent())) / 100;
+
+        return max(1, (int) round($dollars)) * 100;
     }
 
     public static function formatNaira(int $naira): string

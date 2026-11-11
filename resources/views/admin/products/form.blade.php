@@ -50,8 +50,8 @@
                     <h2 class="font-sans text-lg font-bold text-cocoa">Photo @unless ($product->exists)<span class="ff-required">*</span>@endunless</h2>
 
                     <label data-dropzone class="mt-4 block cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-black/15 bg-mist transition hover:border-forest data-dragging:border-forest data-dragging:bg-forest/5">
-                        <img data-image-preview src="{{ $product->image ? asset($product->image) : '' }}" alt="" @class(['aspect-[4/5] w-full object-cover', 'hidden' => ! $product->image])>
-                        <span data-image-empty @class(['flex aspect-[4/5] flex-col items-center justify-center gap-2 px-6 text-center', 'hidden' => $product->image])>
+                        <img data-image-preview src="{{ $product->image ? asset($product->image) : '' }}" alt="" @class(['aspect-[2/3] w-full object-cover', 'hidden' => ! $product->image])>
+                        <span data-image-empty @class(['flex aspect-[2/3] flex-col items-center justify-center gap-2 px-6 text-center', 'hidden' => $product->image])>
                             <svg class="size-10 text-ink/30" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
                             <span class="text-[15px] font-bold text-cocoa">Drop a photo here or click to choose</span>
                             <span class="text-xs text-ink/60">JPG, PNG or WebP, up to 10 MB</span>
@@ -59,6 +59,12 @@
                         <input data-image-input class="sr-only" type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp" @required(! $product->exists)>
                     </label>
                     <p data-image-name class="mt-2 truncate text-xs text-ink/60">{{ $product->exists ? 'Click the photo to replace it.' : '' }}</p>
+
+                    <label class="ff-label mt-4" for="image_credit">Photo credit</label>
+                    <input class="ff-input" type="text" id="image_credit" name="image_credit" maxlength="255" value="{{ old('image_credit', $product->image_credit) }}" placeholder="e.g. Photo: Name, CC BY-SA 4.0" aria-describedby="image-credit-hint">
+                    <label class="ff-label mt-3" for="image_credit_url">Credit link</label>
+                    <input class="ff-input" type="url" id="image_credit_url" name="image_credit_url" maxlength="255" value="{{ old('image_credit_url', $product->image_credit_url) }}" placeholder="https://" aria-describedby="image-credit-hint">
+                    <p id="image-credit-hint" class="mt-1.5 text-xs text-ink/60">Only needed when the photo's licence asks for attribution. It shows under the photo on the product page.</p>
                 </section>
 
                 <section class="rounded-2xl border border-black/8 bg-white p-5">
@@ -74,7 +80,7 @@
                             </div>
                             <p id="price-hint" class="mt-1.5 text-xs text-ink/60">
                                 Most pieces are ₦100,000–₦200,000, including materials, workmanship and delivery.
-                                Card checkout charges the dollar price, worked out at ₦{{ number_format($ngnPerUsd) }} = $1.
+                                Card checkout charges the dollar price, worked out at ₦{{ number_format($ngnPerUsd) }} = $1 plus {{ $usdMarkupPercent }}%.
                                 @if ($product->price_naira)
                                     Currently {{ $product->formattedUsdPrice() }}.
                                 @endif

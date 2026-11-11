@@ -34,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
         ]));
 
         View::composer(
-            ['components.layouts.app', 'partials.contact-details', 'pages.returns'],
+            ['components.layouts.app', 'partials.contact-details', 'partials.any-attire', 'pages.returns'],
             fn ($view) => $view->with('whatsappContacts', WhatsappContact::forStorefront()),
         );
     }

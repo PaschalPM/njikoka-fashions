@@ -30,9 +30,13 @@ return [
 
     'time_slots' => ['09:00 AM', '11:00 AM', '02:00 PM', '04:00 PM'],
 
-    'garment_types' => ['Dress / Gown', 'Suit / Tuxedo', 'Shirt / Blouse', 'Jacket / Outerwear', 'Trousers / Skirt', 'Other'],
+    'garment_types' => [
+        'Agbada', 'Buba and Sokoto', 'Kaftan / Senator', 'Isiagu Set', 'Iro and Buba', 'Wrapper Set (George, Akwete, Ankara)',
+        'Bubu / Kaftan Dress', 'Aso Ebi (Group Order)', 'Gele / Ichafu', 'Children’s Traditional Wear',
+        'Dress / Gown', 'Suit / Tuxedo', 'Shirt / Blouse', 'Jacket / Outerwear', 'Trousers / Skirt', 'Other',
+    ],
 
-    'fabrics' => ['Cotton', 'Silk', 'Wool', 'Linen', 'Satin / Velvet'],
+    'fabrics' => ['Ankara', 'Lace', 'Aso-Oke', 'George', 'Adire', 'Akwete', 'Isiagu', 'Cotton', 'Silk', 'Wool', 'Linen', 'Satin / Velvet'],
 
     'currency' => env('STORE_CURRENCY', 'usd'),
 
@@ -43,5 +47,8 @@ return [
     */
 
     'ngn_per_usd' => (int) env('STORE_NGN_PER_USD', 1500),
+
+    // Starting percentage added to converted dollar prices, until the admin sets one.
+    'usd_markup_percent' => (int) env('STORE_USD_MARKUP_PERCENT', 20),
 
 ];

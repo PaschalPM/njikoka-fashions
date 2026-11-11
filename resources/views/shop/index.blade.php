@@ -28,6 +28,7 @@
             <div>
                 @if ($products->isEmpty())
                     <p class="text-base">No products were found matching your selection.</p>
+                    @include('partials.any-attire', ['class' => 'mt-8', 'heading' => 'Can’t find it? We can make it for you.'])
                 @else
                     <div class="grid gap-x-5 gap-y-[30px] sm:grid-cols-2 xl:grid-cols-3">
                         @foreach ($products as $product)
@@ -35,6 +36,7 @@
                         @endforeach
                     </div>
                     <div class="mt-10">{{ $products->links() }}</div>
+                    @include('partials.any-attire', ['class' => 'mt-12'])
                 @endif
             </div>
         </div>

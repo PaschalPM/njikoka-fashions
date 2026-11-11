@@ -31,19 +31,27 @@
         @csrf
         @method('PUT')
         <div class="flex-1">
-            <label class="font-sans text-base font-bold text-cocoa" for="ngn_per_usd">Exchange rate</label>
-            <p class="text-sm text-ink/60">Prices are set in naira. Card checkout charges the dollar price worked out at this rate.</p>
-            @error('ngn_per_usd')
-                <p class="mt-1 text-sm text-[#e2401c]">{{ $message }}</p>
-            @enderror
+            <p class="font-sans text-base font-bold text-cocoa">Dollar pricing</p>
+            <p class="text-sm text-ink/60">Prices are set in naira. Dollar prices are converted at this rate, then the markup is added. Card checkout charges the dollar price.</p>
+            @foreach (['ngn_per_usd', 'usd_markup_percent'] as $field)
+                @error($field)
+                    <p class="mt-1 text-sm text-[#e2401c]">{{ $message }}</p>
+                @enderror
+            @endforeach
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+            <label class="sr-only" for="ngn_per_usd">Exchange rate in naira per dollar</label>
             <div class="relative">
                 <span class="pointer-events-none absolute top-1/2 left-[15px] -translate-y-1/2 text-ink/50">₦</span>
-                <input class="ff-input w-36 pl-8" type="number" id="ngn_per_usd" name="ngn_per_usd" min="100" step="1" inputmode="numeric" value="{{ old('ngn_per_usd', $ngnPerUsd) }}" required>
+                <input class="ff-input w-32 pl-8" type="number" id="ngn_per_usd" name="ngn_per_usd" min="100" step="1" inputmode="numeric" value="{{ old('ngn_per_usd', $ngnPerUsd) }}" required>
             </div>
-            <span class="shrink-0 text-ink/70">= $1</span>
-            <button class="ff-submit shrink-0">Save rate</button>
+            <span class="shrink-0 text-ink/70">= $1, plus</span>
+            <label class="sr-only" for="usd_markup_percent">Dollar markup percentage</label>
+            <div class="relative">
+                <input class="ff-input w-20 pr-7" type="number" id="usd_markup_percent" name="usd_markup_percent" min="0" max="200" step="1" inputmode="numeric" value="{{ old('usd_markup_percent', $usdMarkupPercent) }}" required>
+                <span class="pointer-events-none absolute top-1/2 right-[12px] -translate-y-1/2 text-ink/50">%</span>
+            </div>
+            <button class="ff-submit shrink-0">Save</button>
         </div>
     </form>
 
@@ -90,7 +98,7 @@
         <ul class="mt-6 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             @foreach ($products as $product)
                 <li class="group flex flex-col overflow-hidden rounded-2xl border border-black/8 bg-white transition hover:shadow-lg">
-                    <a href="{{ route('admin.products.edit', $product) }}" class="relative block aspect-[4/5] overflow-hidden bg-linen">
+                    <a href="{{ route('admin.products.edit', $product) }}" class="relative block aspect-[2/3] overflow-hidden bg-linen">
                         @if ($product->image)
                             <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" loading="lazy" class="size-full object-cover object-[50%_20%] transition duration-300 group-hover:scale-[1.03]">
                         @endif

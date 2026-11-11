@@ -19,11 +19,11 @@ class WishlistTest extends TestCase
         $this->from(route('shop'))
             ->post(route('wishlist.toggle', $product))
             ->assertRedirect(route('shop'))
-            ->assertSessionHas('status', 'Golden Kente Crop Set was added to your favorites.');
+            ->assertSessionHas('status', 'Peach Lace Buba and Iro was added to your favorites.');
 
         $this->get(route('wishlist'))
             ->assertOk()
-            ->assertSee('Golden Kente Crop Set')
+            ->assertSee('Peach Lace Buba and Iro')
             ->assertSee('aria-pressed="true"', false)
             ->assertSee('Favorites, 1 item');
     }
@@ -34,7 +34,7 @@ class WishlistTest extends TestCase
 
         $this->withSession(['wishlist' => [$product->id]])
             ->postJson(route('wishlist.toggle', $product))
-            ->assertExactJson(['saved' => false, 'count' => 0, 'message' => 'Golden Kente Crop Set was removed from your favorites.']);
+            ->assertExactJson(['saved' => false, 'count' => 0, 'message' => 'Peach Lace Buba and Iro was removed from your favorites.']);
 
         $this->get(route('wishlist'))->assertSee("You haven't saved any favorites yet.", false);
     }
@@ -44,7 +44,7 @@ class WishlistTest extends TestCase
         $product = Product::where('slug', 'dress-7')->first();
 
         $this->postJson(route('wishlist.toggle', $product))
-            ->assertExactJson(['saved' => true, 'count' => 1, 'message' => 'Golden Kente Crop Set was added to your favorites.']);
+            ->assertExactJson(['saved' => true, 'count' => 1, 'message' => 'Peach Lace Buba and Iro was added to your favorites.']);
 
         $this->assertSame([$product->id], session('wishlist'));
     }
@@ -70,7 +70,7 @@ class WishlistTest extends TestCase
             ->get(route('cart'))
             ->assertSee('From your favorites')
             ->assertSee(route('cart.store', $saved))
-            ->assertDontSee('Amber Leaf Ankara Gown');
+            ->assertDontSee('Coral Bead Print Wrapper Set');
     }
 
     public function test_flash_messages_show_as_a_dismissable_toast(): void

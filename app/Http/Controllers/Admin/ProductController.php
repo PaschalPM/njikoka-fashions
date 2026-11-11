@@ -38,23 +38,30 @@ class ProductController extends Controller
                 'sold_out' => Product::where('in_stock', false)->count(),
             ],
             'ngnPerUsd' => Setting::ngnPerUsd(),
+            'usdMarkupPercent' => Setting::usdMarkupPercent(),
         ]);
     }
 
     /**
-     * Save a new naira-to-dollar rate and reprice every product's card checkout amount from its naira price.
+     * Save the naira-to-dollar rate and dollar markup, then reprice every product's card checkout amount from its naira price.
      */
     public function updateExchangeRate(Request $request): RedirectResponse
     {
-        $rate = (int) $request->validate(['ngn_per_usd' => ['required', 'integer', 'min:100', 'max:100000']], [], ['ngn_per_usd' => 'exchange rate'])['ngn_per_usd'];
+        $input = $request->validate([
+            'ngn_per_usd' => ['required', 'integer', 'min:100', 'max:100000'],
+            'usd_markup_percent' => ['required', 'integer', 'min:0', 'max:200'],
+        ], [], ['ngn_per_usd' => 'exchange rate', 'usd_markup_percent' => 'dollar markup']);
+        $rate = (int) $input['ngn_per_usd'];
+        $markup = (int) $input['usd_markup_percent'];
 
-        DB::transaction(function () use ($rate) {
+        DB::transaction(function () use ($rate, $markup) {
             Setting::setNgnPerUsd($rate);
+            Setting::setUsdMarkupPercent($markup);
 
-            Product::query()->each(fn (Product $product) => $product->update(['price_cents' => Product::usdCentsFor($product->price_naira, $rate)]));
+            Product::query()->each(fn (Product $product) => $product->update(['price_cents' => Product::usdCentsFor($product->price_naira, $rate, $markup)]));
         });
 
-        return back()->with('status', 'Exchange rate saved: ₦'.number_format($rate).' = $1. Dollar prices were updated.');
+        return back()->with('status', 'Saved: ₦'.number_format($rate)." = \$1, plus {$markup}%. Dollar prices were updated.");
     }
 
     public function create(): View
@@ -63,6 +70,7 @@ class ProductController extends Controller
             'product' => new Product(['in_stock' => true]),
             'categories' => Category::orderBy('name')->get(),
             'ngnPerUsd' => Setting::ngnPerUsd(),
+            'usdMarkupPercent' => Setting::usdMarkupPercent(),
         ]);
     }
 
@@ -82,6 +90,7 @@ class ProductController extends Controller
             'product' => $product,
             'categories' => Category::orderBy('name')->get(),
             'ngnPerUsd' => Setting::ngnPerUsd(),
+            'usdMarkupPercent' => Setting::usdMarkupPercent(),
         ]);
     }
 
@@ -110,7 +119,7 @@ class ProductController extends Controller
     /**
      * Validate the form and convert it to product attributes (naira price plus its dollar price in cents, image as a public path).
      *
-     * @return array{category_id: int, name: string, summary: ?string, description: ?string, price_naira: int, price_cents: int, in_stock: bool, image?: string}
+     * @return array{category_id: int, name: string, summary: ?string, description: ?string, price_naira: int, price_cents: int, in_stock: bool, image_credit: ?string, image_credit_url: ?string, image?: string}
      */
     private function validated(Request $request, bool $imageRequired): array
     {
@@ -121,6 +130,8 @@ class ProductController extends Controller
             'summary' => ['nullable', 'string', 'max:5000'],
             'description' => ['nullable', 'string', 'max:20000'],
             'image' => [$imageRequired ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'image_credit' => ['nullable', 'string', 'max:255'],
+            'image_credit_url' => ['nullable', 'url:http,https', 'max:255'],
         ]);
 
         $data = [
@@ -131,6 +142,8 @@ class ProductController extends Controller
             'price_naira' => (int) $input['price'],
             'price_cents' => Product::usdCentsFor((int) $input['price']),
             'in_stock' => $request->boolean('in_stock'),
+            'image_credit' => $input['image_credit'] ?? null,
+            'image_credit_url' => $input['image_credit_url'] ?? null,
         ];
 
         if ($request->hasFile('image')) {
