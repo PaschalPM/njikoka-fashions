@@ -8,7 +8,8 @@
                 <input class="mt-2 block w-full rounded-lg border border-[#d9d9d9] px-[14px] py-[11px] font-sans text-base text-[#222] outline-none placeholder:text-[#666] focus:border-forest" type="search" id="q" name="q" value="{{ request('q') }}" placeholder="Search, e.g. babban riga, gele, lace…">
 
                 @if ($styleCounts)
-                    <fieldset class="mt-5">
+                    {{-- On phones the style chips above the products do this job, so the long list is hidden. --}}
+                    <fieldset class="mt-5 hidden sm:block">
                         <legend class="text-base leading-6 font-bold text-[#222]">Styles</legend>
                         <div class="mt-[10px] space-y-[10px] text-base leading-6 text-[#222]">
                             @foreach ($styleCounts as $style => $count)
@@ -40,7 +41,7 @@
                 </div>
             </form>
 
-            <div>
+            <div class="min-w-0">
                 @if ($styleCounts)
                     <nav class="-mx-1 mb-6 flex gap-2 overflow-x-auto px-1 pb-1" aria-label="Shop by style">
                         @php($keep = array_filter(['categories' => request()->array('categories'), 'stock' => request('stock')]))
