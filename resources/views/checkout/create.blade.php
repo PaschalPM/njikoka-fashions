@@ -96,22 +96,27 @@
                     @foreach ($items as $item)
                         <li class="flex items-start gap-4 py-4">
                             <span class="relative shrink-0">
-                                <img src="{{ asset($item->product->image) }}" alt="" class="size-12 border border-[#e0e0e0] object-cover">
+                                <img src="{{ asset($item->product->image) }}" alt="" class="size-12 border border-[#e0e0e0] object-cover object-[50%_20%]">
                                 <span class="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full border-2 border-white bg-white text-[11px] shadow">{{ $item->quantity }}</span>
                             </span>
-                            <span class="flex-1 text-[14px]">{{ $item->product->name }}<br><span class="text-[#757575]">{{ $item->product->formattedPrice() }}</span></span>
-                            <span class="text-[14px]">${{ number_format($item->subtotal_cents / 100, 2) }}</span>
+                            <span class="flex-1 text-[14px]">{{ $item->product->name }}<br><span class="text-[#757575]">{{ $item->product->formattedPrice() }} ({{ $item->product->formattedUsdPrice() }})</span></span>
+                            <span class="text-[14px]">{{ \App\Models\Product::formatNaira($item->subtotal_naira) }}</span>
                         </li>
                     @endforeach
                 </ul>
                 <div class="flex justify-between border-t border-[#e0e0e0] px-4 py-3 text-[14px]">
                     <span>Subtotal</span>
-                    <span>${{ number_format($total_cents / 100, 2) }}</span>
+                    <span>{{ \App\Models\Product::formatNaira($total_naira) }}</span>
                 </div>
                 <div class="flex justify-between border-t border-[#e0e0e0] px-4 py-4 text-[18px] font-bold">
                     <span>Total</span>
-                    <span>${{ number_format($total_cents / 100, 2) }}</span>
+                    <span>{{ \App\Models\Product::formatNaira($total_naira) }}</span>
                 </div>
+                <div class="flex justify-between border-t border-[#e0e0e0] px-4 py-3 text-[14px] text-[#555]">
+                    <span>Charged by card in US dollars</span>
+                    <span class="font-bold">{{ \App\Models\Product::formatUsd($total_cents) }}</span>
+                </div>
+                @include('partials.price-note', ['class' => 'px-4 pb-4 text-xs leading-relaxed text-[#757575]'])
             </aside>
         </form>
     </section>

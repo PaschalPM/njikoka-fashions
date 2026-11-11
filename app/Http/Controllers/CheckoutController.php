@@ -26,6 +26,7 @@ class CheckoutController extends Controller
 
         return view('checkout.create', [
             'items' => $items,
+            'total_naira' => $items->sum('subtotal_naira'),
             'total_cents' => $items->sum('subtotal_cents'),
             'user' => $request->user(),
         ]);
@@ -87,7 +88,7 @@ class CheckoutController extends Controller
     }
 
     /**
-     * @param  Collection<int, object{product: Product, quantity: int, subtotal_cents: int}>  $items
+     * @param  Collection<int, object{product: Product, quantity: int, subtotal_naira: int, subtotal_cents: int}>  $items
      */
     private function createStripeSession(StripeClient $stripe, Order $order, Collection $items): Session
     {
@@ -142,7 +143,7 @@ class CheckoutController extends Controller
     /**
      * Resolve the session cart into products with quantities and subtotals.
      *
-     * @return Collection<int, object{product: Product, quantity: int, subtotal_cents: int}>
+     * @return Collection<int, object{product: Product, quantity: int, subtotal_naira: int, subtotal_cents: int}>
      */
     private function cartItems(Request $request): Collection
     {
@@ -152,6 +153,7 @@ class CheckoutController extends Controller
             ->map(fn (Product $product) => (object) [
                 'product' => $product,
                 'quantity' => $quantities[$product->id],
+                'subtotal_naira' => $product->price_naira * $quantities[$product->id],
                 'subtotal_cents' => $product->price_cents * $quantities[$product->id],
             ]);
     }

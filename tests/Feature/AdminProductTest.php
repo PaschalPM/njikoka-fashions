@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -35,8 +36,9 @@ class AdminProductTest extends TestCase
         $this->actingAs(User::factory()->admin()->create())
             ->get(route('admin.products.index'))
             ->assertOk()
-            ->assertSee('Dress 12')
-            ->assertSee('$285.00');
+            ->assertSee('Lime Ankara Wrapper Set')
+            ->assertSee('₦140,000')
+            ->assertSee('$93');
     }
 
     public function test_admin_home_opens_the_product_list(): void
@@ -51,17 +53,17 @@ class AdminProductTest extends TestCase
         Product::where('slug', 'dress-12')->update(['in_stock' => false]);
         $this->actingAs(User::factory()->admin()->create());
 
-        $this->get(route('admin.products.index', ['q' => 'Dress 1']))
-            ->assertSee('Dress 12')
-            ->assertDontSee('Dress 9');
+        $this->get(route('admin.products.index', ['q' => 'Lime']))
+            ->assertSee('Lime Ankara Wrapper Set')
+            ->assertDontSee('Amber Leaf Ankara Gown');
 
         $this->get(route('admin.products.index', ['category' => Category::where('slug', 'men')->value('id')]))
-            ->assertSee('$260.00')
-            ->assertDontSee('Dress 12');
+            ->assertSee('₦175,000')
+            ->assertDontSee('Lime Ankara Wrapper Set');
 
         $this->get(route('admin.products.index', ['stock' => 'out']))
-            ->assertSee('Dress 12')
-            ->assertDontSee('Dress 11');
+            ->assertSee('Lime Ankara Wrapper Set')
+            ->assertDontSee('Festival Print Head Wrap');
     }
 
     public function test_admin_sees_the_add_and_edit_forms(): void
@@ -69,7 +71,7 @@ class AdminProductTest extends TestCase
         $this->actingAs(User::factory()->admin()->create());
 
         $this->get(route('admin.products.create'))->assertOk()->assertSee('Add product');
-        $this->get(route('admin.products.edit', 'dress-7'))->assertOk()->assertSee('value="300.00"', false);
+        $this->get(route('admin.products.edit', 'dress-7'))->assertOk()->assertSee('value="180000"', false);
     }
 
     public function test_admin_can_add_a_product_with_a_photo(): void
@@ -81,12 +83,42 @@ class AdminProductTest extends TestCase
             ->assertRedirect(route('admin.products.index'));
 
         $product = Product::where('name', 'Ankara Wrap Dress')->sole();
-        $this->assertSame(14999, $product->price_cents);
+        $this->assertSame(150000, $product->price_naira);
+        $this->assertSame(10000, $product->price_cents);
         $this->assertSame('ankara-wrap-dress', $product->slug);
         $this->assertTrue($product->in_stock);
         Storage::disk('public')->assertExists(str($product->image)->after('storage/')->value());
 
-        $this->get(route('product', $product))->assertOk()->assertSee('$149.99');
+        $this->get(route('product', $product))->assertOk()->assertSee('₦150,000')->assertSee('$100');
+    }
+
+    public function test_changing_the_exchange_rate_reprices_dollar_amounts(): void
+    {
+        $this->actingAs(User::factory()->admin()->create())
+            ->put(route('admin.exchange-rate.update'), ['ngn_per_usd' => 1600])
+            ->assertRedirect()
+            ->assertSessionHas('status', 'Exchange rate saved: ₦1,600 = $1. Dollar prices were updated.');
+
+        $product = Product::firstWhere('slug', 'dress-2');
+        $this->assertSame(200000, $product->price_naira);
+        $this->assertSame(12500, $product->price_cents);
+        $this->assertSame(1600, Setting::ngnPerUsd());
+    }
+
+    public function test_customers_cannot_change_the_exchange_rate(): void
+    {
+        $this->actingAs(User::factory()->create())
+            ->put(route('admin.exchange-rate.update'), ['ngn_per_usd' => 1600])
+            ->assertForbidden();
+
+        $this->assertSame(13300, Product::firstWhere('slug', 'dress-2')->price_cents);
+    }
+
+    public function test_the_exchange_rate_must_be_a_whole_number_of_at_least_100(): void
+    {
+        $this->actingAs(User::factory()->admin()->create())
+            ->put(route('admin.exchange-rate.update'), ['ngn_per_usd' => 5])
+            ->assertSessionHasErrors(['ngn_per_usd' => 'The exchange rate field must be at least 100.']);
     }
 
     public function test_new_products_get_a_unique_slug(): void
@@ -102,10 +134,10 @@ class AdminProductTest extends TestCase
     public function test_a_photo_and_valid_price_are_required(): void
     {
         $this->actingAs(User::factory()->admin()->create())
-            ->post(route('admin.products.store'), $this->productFields(['image' => null, 'price' => '12.345']))
+            ->post(route('admin.products.store'), $this->productFields(['image' => null, 'price' => '150000.50']))
             ->assertSessionHasErrors([
                 'image' => 'The image field is required.',
-                'price' => 'The price field must have 0-2 decimal places.',
+                'price' => 'The price field must be an integer.',
             ]);
     }
 
@@ -133,13 +165,14 @@ class AdminProductTest extends TestCase
         $product = Product::where('slug', 'dress-7')->first();
 
         $this->actingAs(User::factory()->admin()->create())
-            ->put(route('admin.products.update', $product), $this->productFields(['image' => null, 'price' => '310', 'in_stock' => null]))
+            ->put(route('admin.products.update', $product), $this->productFields(['image' => null, 'price' => '195000', 'in_stock' => null]))
             ->assertRedirect(route('admin.products.index'));
 
         $product->refresh();
-        $this->assertSame(31000, $product->price_cents);
+        $this->assertSame(195000, $product->price_naira);
+        $this->assertSame(13000, $product->price_cents);
         $this->assertFalse($product->in_stock);
-        $this->assertSame('images/products/Patrick-U-Patrick_R1-01-scaled.webp', $product->image);
+        $this->assertSame('images/products/nigerian-fashion-07.webp', $product->image);
         $this->assertSame('dress-7', $product->slug);
     }
 
@@ -178,7 +211,7 @@ class AdminProductTest extends TestCase
         return array_merge([
             'name' => 'Ankara Wrap Dress',
             'category_id' => Category::where('slug', 'women')->value('id'),
-            'price' => '149.99',
+            'price' => '150000',
             'summary' => '<p>Hand-tailored wrap dress.</p>',
             'description' => '',
             'image' => UploadedFile::fake()->image('dress.jpg', 800, 800),

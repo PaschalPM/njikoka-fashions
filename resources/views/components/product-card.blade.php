@@ -3,7 +3,7 @@
 <article class="flex flex-col items-center text-center">
     <div class="relative w-full overflow-hidden rounded-[25px] {{ $imageClass }}">
         <a href="{{ route('product', $product) }}" class="block size-full">
-            <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" loading="lazy" class="size-full object-cover">
+            <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" loading="lazy" class="size-full object-cover object-[50%_20%]">
         </a>
         @include('partials.wishlist-button', ['class' => 'absolute top-[30px] right-[30px]'])
         @if ($product->in_stock)

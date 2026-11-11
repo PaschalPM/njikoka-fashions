@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -35,7 +37,24 @@ class ProductController extends Controller
                 'in_stock' => Product::where('in_stock', true)->count(),
                 'sold_out' => Product::where('in_stock', false)->count(),
             ],
+            'ngnPerUsd' => Setting::ngnPerUsd(),
         ]);
+    }
+
+    /**
+     * Save a new naira-to-dollar rate and reprice every product's card checkout amount from its naira price.
+     */
+    public function updateExchangeRate(Request $request): RedirectResponse
+    {
+        $rate = (int) $request->validate(['ngn_per_usd' => ['required', 'integer', 'min:100', 'max:100000']], [], ['ngn_per_usd' => 'exchange rate'])['ngn_per_usd'];
+
+        DB::transaction(function () use ($rate) {
+            Setting::setNgnPerUsd($rate);
+
+            Product::query()->each(fn (Product $product) => $product->update(['price_cents' => Product::usdCentsFor($product->price_naira, $rate)]));
+        });
+
+        return back()->with('status', 'Exchange rate saved: ₦'.number_format($rate).' = $1. Dollar prices were updated.');
     }
 
     public function create(): View
@@ -43,6 +62,7 @@ class ProductController extends Controller
         return view('admin.products.form', [
             'product' => new Product(['in_stock' => true]),
             'categories' => Category::orderBy('name')->get(),
+            'ngnPerUsd' => Setting::ngnPerUsd(),
         ]);
     }
 
@@ -61,6 +81,7 @@ class ProductController extends Controller
         return view('admin.products.form', [
             'product' => $product,
             'categories' => Category::orderBy('name')->get(),
+            'ngnPerUsd' => Setting::ngnPerUsd(),
         ]);
     }
 
@@ -87,16 +108,16 @@ class ProductController extends Controller
     }
 
     /**
-     * Validate the form and convert it to product attributes (price in cents, image as a public path).
+     * Validate the form and convert it to product attributes (naira price plus its dollar price in cents, image as a public path).
      *
-     * @return array{category_id: int, name: string, summary: ?string, description: ?string, price_cents: int, in_stock: bool, image?: string}
+     * @return array{category_id: int, name: string, summary: ?string, description: ?string, price_naira: int, price_cents: int, in_stock: bool, image?: string}
      */
     private function validated(Request $request, bool $imageRequired): array
     {
         $input = $request->validate([
             'name' => ['required', 'string', 'max:200'],
             'category_id' => ['required', Rule::exists('categories', 'id')],
-            'price' => ['required', 'decimal:0,2', 'min:0.5', 'max:100000'],
+            'price' => ['required', 'integer', 'min:1000', 'max:100000000'],
             'summary' => ['nullable', 'string', 'max:5000'],
             'description' => ['nullable', 'string', 'max:20000'],
             'image' => [$imageRequired ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
@@ -107,7 +128,8 @@ class ProductController extends Controller
             'name' => $input['name'],
             'summary' => $input['summary'] ?? null,
             'description' => $input['description'] ?? null,
-            'price_cents' => (int) round($input['price'] * 100),
+            'price_naira' => (int) $input['price'],
+            'price_cents' => Product::usdCentsFor((int) $input['price']),
             'in_stock' => $request->boolean('in_stock'),
         ];
 

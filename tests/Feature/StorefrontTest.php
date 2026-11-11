@@ -27,7 +27,8 @@ class StorefrontTest extends TestCase
             $this->get(route($route))->assertOk();
         }
 
-        $this->get(route('product', 'dress-1'))->assertOk()->assertSee('$20.00');
+        $this->get(route('product', 'dress-1'))->assertOk()->assertSee('₦150,000')->assertSee('$100')
+            ->assertSee('Prices include materials, workmanship and delivery.');
     }
 
     public function test_home_page_uses_the_original_copy_and_contact_details(): void
@@ -40,10 +41,10 @@ class StorefrontTest extends TestCase
 
     public function test_shop_filters_by_category(): void
     {
-        $this->get(route('shop', ['categories' => ['women'], 'q' => 'Dress 12']))
+        $this->get(route('shop', ['categories' => ['women'], 'q' => 'Ankara']))
             ->assertOk()
-            ->assertSee('Dress 12')
-            ->assertDontSee('Dress 11');
+            ->assertSee('Lime Ankara Wrapper Set')
+            ->assertDontSee('Festival Print Head Wrap');
     }
 
     public function test_products_can_be_added_to_the_cart(): void
@@ -52,7 +53,17 @@ class StorefrontTest extends TestCase
 
         $this->post(route('cart.store', $product), ['quantity' => 2])->assertRedirect();
 
-        $this->get(route('cart'))->assertSee('Dress 7')->assertSee('600.00');
+        $this->get(route('cart'))->assertSee('Golden Kente Crop Set')->assertSee('₦360,000')->assertSee('$240 by card');
+    }
+
+    public function test_checkout_shows_the_naira_total_and_the_dollar_card_charge(): void
+    {
+        $product = Product::where('slug', 'dress-7')->first();
+
+        $this->withSession(['cart' => [$product->id => 2]])
+            ->get(route('checkout'))
+            ->assertOk()
+            ->assertSeeInOrder(['Total', '₦360,000', 'Charged by card in US dollars', '$240']);
     }
 
     public function test_checkout_creates_an_order_and_redirects_to_stripe(): void
@@ -61,7 +72,7 @@ class StorefrontTest extends TestCase
         $sessions = $this->fakeStripeSessions();
 
         $sessions->shouldReceive('create')->once()
-            ->withArgs(fn ($params) => $params['line_items'][0]['price_data']['unit_amount'] === 30000
+            ->withArgs(fn ($params) => $params['line_items'][0]['price_data']['unit_amount'] === 12000
                 && $params['line_items'][0]['quantity'] === 2)
             ->andReturn(Session::constructFrom(['id' => 'cs_test_123', 'url' => 'https://checkout.stripe.com/c/pay/cs_test_123']));
 
@@ -70,7 +81,7 @@ class StorefrontTest extends TestCase
             ->assertRedirect('https://checkout.stripe.com/c/pay/cs_test_123');
 
         $order = Order::with('items')->sole();
-        $this->assertSame(60000, $order->total_cents);
+        $this->assertSame(24000, $order->total_cents);
         $this->assertSame('cs_test_123', $order->stripe_session_id);
         $this->assertSame('pending', $order->status);
         $this->assertSame(2, $order->items->first()->quantity);

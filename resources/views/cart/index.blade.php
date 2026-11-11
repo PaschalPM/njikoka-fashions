@@ -26,7 +26,7 @@
                         @foreach ($items as $item)
                             <li class="flex gap-4 rounded-2xl bg-white p-4 shadow-[0_6px_20px_rgba(43,29,24,0.06)] sm:gap-6 sm:p-5">
                                 <a href="{{ route('product', $item->product) }}" class="w-24 shrink-0 overflow-hidden rounded-xl bg-linen sm:w-32">
-                                    <img src="{{ asset($item->product->image) }}" alt="{{ $item->product->name }}" class="aspect-[4/5] size-full object-cover">
+                                    <img src="{{ asset($item->product->image) }}" alt="{{ $item->product->name }}" class="aspect-[4/5] size-full object-cover object-[50%_20%]">
                                 </a>
 
                                 <div class="flex min-w-0 flex-1 flex-col">
@@ -34,9 +34,9 @@
                                         <div class="min-w-0">
                                             <p class="text-xs font-bold tracking-[0.08em] text-ink/50 uppercase">{{ $item->product->category->name }}</p>
                                             <h2 class="mt-1 truncate text-[22px] leading-tight sm:text-[26px]"><a href="{{ route('product', $item->product) }}" class="hover:text-forest">{{ $item->product->name }}</a></h2>
-                                            <p class="mt-1 text-sm text-ink/60">{{ $item->product->formattedPrice() }} each</p>
+                                            <p class="mt-1 text-sm text-ink/60">{{ $item->product->formattedPrice() }} ({{ $item->product->formattedUsdPrice() }}) each</p>
                                         </div>
-                                        <p class="shrink-0 text-lg font-bold text-cocoa">${{ number_format($item->subtotal_cents / 100, 2) }}</p>
+                                        <p class="shrink-0 text-right text-lg font-bold text-cocoa">{{ \App\Models\Product::formatNaira($item->subtotal_naira) }}<span class="block text-sm font-normal text-ink/50">{{ \App\Models\Product::formatUsd($item->subtotal_cents) }}</span></p>
                                     </div>
 
                                     <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-4">
@@ -68,13 +68,14 @@
                         <dl class="mt-6 space-y-3 text-base">
                             <div class="flex justify-between">
                                 <dt class="text-ink/70">Subtotal ({{ $item_count }} {{ Str::plural('item', $item_count) }})</dt>
-                                <dd>${{ number_format($total_cents / 100, 2) }}</dd>
+                                <dd>{{ \App\Models\Product::formatNaira($total_naira) }}</dd>
                             </div>
                             <div class="flex items-baseline justify-between border-t border-sand pt-4">
                                 <dt class="text-lg font-bold text-cocoa">Estimated total</dt>
-                                <dd class="text-[26px] font-bold text-forest">${{ number_format($total_cents / 100, 2) }}</dd>
+                                <dd class="text-right text-[26px] font-bold text-forest">{{ \App\Models\Product::formatNaira($total_naira) }}<span class="block text-sm font-normal text-ink/60">{{ \App\Models\Product::formatUsd($total_cents) }} by card</span></dd>
                             </div>
                         </dl>
+                        @include('partials.price-note', ['class' => 'mt-4 text-xs leading-relaxed text-ink/60'])
 
                         <a href="{{ route('checkout') }}" class="btn-primary mt-6 w-full py-[18px] text-[17px]">Proceed to Checkout</a>
 

@@ -36,4 +36,12 @@ return [
 
     'currency' => env('STORE_CURRENCY', 'usd'),
 
+    /*
+    | Starting exchange rate (naira per US dollar) until the admin sets one on
+    | the Products page. Prices are entered in naira; card payments are charged
+    | in the dollar amount worked out from this rate.
+    */
+
+    'ngn_per_usd' => (int) env('STORE_NGN_PER_USD', 1500),
+
 ];

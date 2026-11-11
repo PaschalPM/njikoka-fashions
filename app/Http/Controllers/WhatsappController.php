@@ -47,12 +47,12 @@ class WhatsappController extends Controller
             return redirect()->route('cart');
         }
 
-        $lines = $items->map(fn ($item) => "• {$item->product->name} × {$item->quantity}: $".number_format($item->subtotal_cents / 100, 2)
-            ."\n  ".route('product', $item->product));
+        $lines = $items->map(fn ($item) => "• {$item->product->name} × {$item->quantity}: ".Product::formatNaira($item->subtotal_naira)
+            .' (about '.Product::formatUsd($item->subtotal_cents).")\n  ".route('product', $item->product));
 
         $message = "Hi Njikoka Fashions! I'd like to order:\n\n"
             .$lines->implode("\n")
-            ."\n\nTotal: $".number_format($items->sum('subtotal_cents') / 100, 2)
+            ."\n\nTotal: ".Product::formatNaira($items->sum('subtotal_naira')).' (about '.Product::formatUsd($items->sum('subtotal_cents')).')'
             ."\n\nCould you help me complete this order?";
 
         return $this->open($request, $contact, $message, [
@@ -92,7 +92,7 @@ class WhatsappController extends Controller
     /**
      * Resolve the session cart into products with quantities and subtotals.
      *
-     * @return Collection<int, object{product: Product, quantity: int, subtotal_cents: int}>
+     * @return Collection<int, object{product: Product, quantity: int, subtotal_naira: int, subtotal_cents: int}>
      */
     private function cartItems(Request $request): Collection
     {
@@ -102,6 +102,7 @@ class WhatsappController extends Controller
             ->map(fn (Product $product) => (object) [
                 'product' => $product,
                 'quantity' => $quantities[$product->id],
+                'subtotal_naira' => $product->price_naira * $quantities[$product->id],
                 'subtotal_cents' => $product->price_cents * $quantities[$product->id],
             ]);
     }

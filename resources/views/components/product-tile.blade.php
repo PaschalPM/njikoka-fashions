@@ -4,7 +4,7 @@
 <article @if ($removeOnUnsave) data-wishlist-item @endif class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_6px_20px_rgba(43,29,24,0.06)] transition duration-300 data-leaving:scale-95 data-leaving:opacity-0">
     <div class="relative aspect-[4/5] overflow-hidden bg-linen">
         <a href="{{ route('product', $product) }}" class="block size-full">
-            <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" loading="lazy" class="size-full object-cover transition duration-500 group-hover:scale-[1.03]">
+            <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" loading="lazy" class="size-full object-cover object-[50%_20%] transition duration-500 group-hover:scale-[1.03]">
         </a>
         @include('partials.wishlist-button', ['class' => 'absolute top-3 right-3'])
         @unless ($product->in_stock)
@@ -17,7 +17,7 @@
             <p class="text-xs font-bold tracking-[0.08em] text-ink/50 uppercase">{{ $product->category->name }}</p>
         @endif
         <h3 class="mt-1 text-[22px] leading-tight"><a href="{{ route('product', $product) }}" class="hover:text-forest">{{ $product->name }}</a></h3>
-        <p class="mt-1 font-sans text-base text-forest">{{ $product->formattedPrice() }}</p>
+        <p class="mt-1 font-sans text-base text-forest">{{ $product->formattedPrice() }} <span class="text-sm text-ink/50">· {{ $product->formattedUsdPrice() }}</span></p>
 
         <div class="mt-auto pt-4">
             @if ($inCart)

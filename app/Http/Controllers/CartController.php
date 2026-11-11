@@ -19,6 +19,7 @@ class CartController extends Controller
             ->map(fn (Product $product) => (object) [
                 'product' => $product,
                 'quantity' => $quantities[$product->id],
+                'subtotal_naira' => $product->price_naira * $quantities[$product->id],
                 'subtotal_cents' => $product->price_cents * $quantities[$product->id],
             ]);
 
@@ -27,6 +28,7 @@ class CartController extends Controller
         return view('cart.index', [
             'items' => $items,
             'item_count' => $items->sum('quantity'),
+            'total_naira' => $items->sum('subtotal_naira'),
             'total_cents' => $items->sum('subtotal_cents'),
             'favorites' => Product::whereIn('id', $favoriteIds)->where('in_stock', true)->take(4)->get(),
             'newInStore' => $items->isEmpty() ? Product::where('in_stock', true)->latest('id')->take(4)->get() : collect(),
@@ -37,7 +39,7 @@ class CartController extends Controller
     /**
      * One link per admin-listed WhatsApp contact; the customer picks who follows up on the order.
      *
-     * @param  Collection<int, object{product: Product, quantity: int, subtotal_cents: int}>  $items
+     * @param  Collection<int, object{product: Product, quantity: int, subtotal_naira: int, subtotal_cents: int}>  $items
      * @return Collection<int, object{contact: WhatsappContact, url: string}>
      */
     private function whatsappOrderLinks(Collection $items): Collection

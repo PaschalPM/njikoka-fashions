@@ -7,7 +7,7 @@
         <div class="mx-auto max-w-[1340px] px-[10px] pt-[50px] pb-[100px] lg:px-0">
             <div class="grid gap-10 lg:grid-cols-2">
                 <div class="flex items-start justify-center">
-                    <img fetchpriority="high" src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="aspect-square w-full max-w-[325px] object-cover">
+                    <img fetchpriority="high" src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="aspect-square w-full max-w-[325px] object-cover object-[50%_20%]">
                 </div>
 
                 <div>
@@ -18,7 +18,8 @@
                     @if ($product->summary)
                         <div class="mt-[30px] space-y-[14px] [&_p]:leading-6">{!! $product->summary !!}</div>
                     @endif
-                    <p class="mt-[45px] text-[20px] font-bold text-black">{{ $product->formattedPrice() }}</p>
+                    <p class="mt-[45px] text-[24px] font-bold text-black">{{ $product->formattedPrice() }} <span class="text-[17px] font-normal text-ink/60">({{ $product->formattedUsdPrice() }})</span></p>
+                    @include('partials.price-note', ['class' => 'mt-2 max-w-[460px] text-sm text-ink/60'])
 
                     @if ($product->in_stock)
                         <form method="POST" action="{{ route('cart.store', $product) }}" class="mt-[30px] flex items-center gap-[14px]">

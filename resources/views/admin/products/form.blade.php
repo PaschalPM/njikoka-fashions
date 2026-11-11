@@ -66,12 +66,19 @@
 
                     <div class="mt-4 space-y-4">
                         <div>
-                            <label class="ff-label" for="price">Price<span class="ff-required">*</span></label>
+                            <label class="ff-label" for="price">Price in naira<span class="ff-required">*</span></label>
                             <div class="relative">
-                                <span class="pointer-events-none absolute top-1/2 left-[15px] -translate-y-1/2 text-ink/50">$</span>
-                                <input class="ff-input pl-8" type="number" id="price" name="price" min="0.50" step="0.01" inputmode="decimal" placeholder="0.00"
-                                       value="{{ old('price', $product->price_cents !== null ? number_format($product->price_cents / 100, 2, '.', '') : '') }}" required>
+                                <span class="pointer-events-none absolute top-1/2 left-[15px] -translate-y-1/2 text-ink/50">₦</span>
+                                <input class="ff-input pl-8" type="number" id="price" name="price" min="1000" step="1" inputmode="numeric" placeholder="150000"
+                                       value="{{ old('price', $product->price_naira ?: '') }}" aria-describedby="price-hint" required>
                             </div>
+                            <p id="price-hint" class="mt-1.5 text-xs text-ink/60">
+                                Most pieces are ₦100,000–₦200,000, including materials, workmanship and delivery.
+                                Card checkout charges the dollar price, worked out at ₦{{ number_format($ngnPerUsd) }} = $1.
+                                @if ($product->price_naira)
+                                    Currently {{ $product->formattedUsdPrice() }}.
+                                @endif
+                            </p>
                         </div>
 
                         <div>

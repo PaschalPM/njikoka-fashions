@@ -65,6 +65,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'can:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::redirect('/', '/admin/products')->name('home');
     Route::resource('products', AdminProductController::class)->except('show');
+    Route::put('exchange-rate', [AdminProductController::class, 'updateExchangeRate'])->name('exchange-rate.update');
     Route::resource('design-requests', DesignRequestController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::resource('appointments', AdminAppointmentController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::get('whatsapp', [WhatsappContactController::class, 'index'])->name('whatsapp.index');

@@ -54,7 +54,7 @@ class WhatsAppChatTest extends TestCase
         $this->get(route('product', $product))->assertSee(route('whatsapp.chat', ['2348135438144', 'product' => 'dress-7']), false);
 
         $this->get(route('whatsapp.chat', ['2348135438144', 'product' => 'dress-7']))
-            ->assertRedirect('https://wa.me/2348135438144?text='.rawurlencode("Hi Njikoka Fashions! I'm interested in Dress 7: ".route('product', 'dress-7')));
+            ->assertRedirect('https://wa.me/2348135438144?text='.rawurlencode("Hi Njikoka Fashions! I'm interested in Golden Kente Crop Set: ".route('product', 'dress-7')));
 
         $this->assertSame($product->id, WhatsappClick::sole()->product_id);
     }
@@ -101,16 +101,16 @@ class WhatsAppChatTest extends TestCase
         [$dress7, $dress8] = Product::whereIn('slug', ['dress-7', 'dress-8'])->orderBy('slug')->get();
 
         $message = "Hi Njikoka Fashions! I'd like to order:\n\n"
-            ."• Dress 7 × 2: $600.00\n  ".route('product', $dress7)."\n"
-            ."• Dress 8 × 1: $285.00\n  ".route('product', $dress8)
-            ."\n\nTotal: $885.00\n\nCould you help me complete this order?";
+            ."• Golden Kente Crop Set × 2: ₦360,000 (about $240)\n  ".route('product', $dress7)."\n"
+            ."• Indigo Stripe Wrap Set × 1: ₦150,000 (about $100)\n  ".route('product', $dress8)
+            ."\n\nTotal: ₦510,000 (about $340)\n\nCould you help me complete this order?";
 
         $this->withSession(['cart' => [$dress7->id => 2, $dress8->id => 1]])
             ->get(route('whatsapp.order', '2347031102089'))
             ->assertRedirect('https://wa.me/2347031102089?text='.rawurlencode($message));
 
         $click = WhatsappClick::sole();
-        $this->assertSame(['Paschal', 'order', 3, 88500], [$click->contact_label, $click->source, $click->cart_items, $click->cart_total_cents]);
+        $this->assertSame(['Paschal', 'order', 3, 34000], [$click->contact_label, $click->source, $click->cart_items, $click->cart_total_cents]);
     }
 
     public function test_an_order_with_an_empty_cart_goes_back_to_the_cart(): void

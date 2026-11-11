@@ -27,6 +27,26 @@
         @endforeach
     </dl>
 
+    <form method="POST" action="{{ route('admin.exchange-rate.update') }}" class="mt-6 flex flex-col gap-3 rounded-2xl border border-black/8 bg-white p-4 sm:flex-row sm:items-center sm:gap-5 sm:p-5">
+        @csrf
+        @method('PUT')
+        <div class="flex-1">
+            <label class="font-sans text-base font-bold text-cocoa" for="ngn_per_usd">Exchange rate</label>
+            <p class="text-sm text-ink/60">Prices are set in naira. Card checkout charges the dollar price worked out at this rate.</p>
+            @error('ngn_per_usd')
+                <p class="mt-1 text-sm text-[#e2401c]">{{ $message }}</p>
+            @enderror
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="relative">
+                <span class="pointer-events-none absolute top-1/2 left-[15px] -translate-y-1/2 text-ink/50">₦</span>
+                <input class="ff-input w-36 pl-8" type="number" id="ngn_per_usd" name="ngn_per_usd" min="100" step="1" inputmode="numeric" value="{{ old('ngn_per_usd', $ngnPerUsd) }}" required>
+            </div>
+            <span class="shrink-0 text-ink/70">= $1</span>
+            <button class="ff-submit shrink-0">Save rate</button>
+        </div>
+    </form>
+
     <form method="GET" action="{{ route('admin.products.index') }}" class="mt-6 flex flex-col gap-3 rounded-2xl border border-black/8 bg-white p-3 sm:flex-row sm:items-center">
         <label class="relative flex-1">
             <span class="sr-only">Search products</span>
@@ -72,7 +92,7 @@
                 <li class="group flex flex-col overflow-hidden rounded-2xl border border-black/8 bg-white transition hover:shadow-lg">
                     <a href="{{ route('admin.products.edit', $product) }}" class="relative block aspect-[4/5] overflow-hidden bg-linen">
                         @if ($product->image)
-                            <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" loading="lazy" class="size-full object-cover transition duration-300 group-hover:scale-[1.03]">
+                            <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" loading="lazy" class="size-full object-cover object-[50%_20%] transition duration-300 group-hover:scale-[1.03]">
                         @endif
                         <span @class([
                             'absolute top-3 left-3 rounded-full px-2.5 py-1 text-xs font-bold backdrop-blur',
@@ -83,7 +103,7 @@
                     <div class="flex flex-1 flex-col p-3 sm:p-4">
                         <p class="text-xs font-bold tracking-wide text-ink/50 uppercase">{{ $product->category->name }}</p>
                         <h2 class="mt-1 truncate font-sans text-base font-bold text-cocoa sm:text-lg">{{ $product->name }}</h2>
-                        <p class="mt-0.5 text-lg text-forest">{{ $product->formattedPrice() }}</p>
+                        <p class="mt-0.5 text-lg text-forest">{{ $product->formattedPrice() }} <span class="text-sm text-ink/50">{{ $product->formattedUsdPrice() }}</span></p>
                         <div class="mt-auto flex items-center gap-2 pt-3">
                             <a href="{{ route('admin.products.edit', $product) }}" class="flex-1 rounded-full border border-forest py-2 text-center text-sm font-medium text-forest transition hover:bg-forest hover:text-white">Edit</a>
                             <a href="{{ route('product', $product) }}" target="_blank" rel="noopener" class="flex size-9 shrink-0 items-center justify-center rounded-full text-ink/50 transition hover:bg-mist hover:text-ink" aria-label="View {{ $product->name }} in the shop" title="View in shop">
